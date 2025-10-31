@@ -6,7 +6,7 @@ Chloe Lee, Isabella Niemi, Marah Sami, Gloria Wu
 
 # Setup
 
-From the root directory (`./traffic-sign-localization`) of the repository, follow the subsequent steps to set everything up.
+From the root directory of the repository (`./traffic-sign-localization`), follow the subsequent steps to set everything up.
 
 Create and enter a virtual environment:
 ```
