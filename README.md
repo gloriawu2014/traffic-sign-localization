@@ -19,6 +19,12 @@ Install the dependencies:
 pip install -r requirements.txt
 ```
 
+Decompress the dataset:
+```
+cd data
+tar -xvjf JPEGImages.tar.bz2
+```
+
 # Run the Model
 
 Make sure you are in a virtual environment:

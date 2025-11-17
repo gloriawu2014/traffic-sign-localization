@@ -1,44 +1,77 @@
 """
-Script for training a traffic sign detection model using YOLO.
+Script for training a traffic sign detection model.
+Dataset: https://www.vicos.si/resources/dfg/
+Annotations are in the COCO json format compatible with Detectron/Mask-RCNN
 """
 
 import torch
 import torchvision
 import torchvision.transforms as transforms
-from PIL import Image
+import json
 import os
-from lisa import LISA
+from PIL import Image
 
 
-def data():
-    # load and process LISA dataset
-    LISA(root='data', download=True, train=True)
-    images_tensor_0 = torch.load("data/lisa-batches/images_0.tensor")
-    images_tensor_1 = torch.load("data/lisa-batches/images_1.tensor")
-    images_tensor_2 = torch.load("data/lisa-batches/images_2.tensor")
-    labels_tensor = torch.load("data/lisa-batches/labels.tensor")
-    #print(images_tensor_0.shape) [2619, 3, 32, 32]
-    #print(images_tensor_1.shape) [2619, 3, 32, 32]
-    #print(images_tensor_2.shape) [2619, 3, 32, 32]
-    #print(labels_tensor.shape)  [7855]
-    #print(labels_tensor[0]) tensor(0)
+"""
+Class for parsing annotations in COCO json format.
+Requires a folder with all images and a json file with annotations.
+"""
+class COCOTrafficSigns(torch.utils.data.Dataset):
+    def __init__(self, image_folder, annotation_file, transforms=None):
+        """
+        image_folder: folder containing all images
+        annotation_file: path to single JSON file
+        """
+        self.root = image_folder
+        self.transforms = transforms
 
-    return images_tensor_0, images_tensor_1, images_tensor_2, labels_tensor
+        with open(annotation_file, 'r') as f:
+            data = json.load(f)
+        
+        self.images = data["images"]
+        self.annotations = data["annotations"]
 
-    ### classification IDs, not info about bounding box
-
-def view_images(images_tensor):
-    # convert tensor to images
-    output_dir = "data/lisa_images/images_2"
-    os.makedirs(output_dir, exist_ok=True)
+        # dictionary: img_id -> list of annotations
+        self.ann_map = {}
+        for ann in self.annotations:
+            img_id = ann["image_id"]
+            if img_id not in self.ann_map:
+                self.ann_map[img_id] = []
+            self.ann_map[img_id].append(ann)
+        
+    def __len__(self):
+        return len(self.images)
     
-    to_pil = transforms.ToPILImage()
+    def __getitem__(self, idx):
+        img_info = self.images[idx]
+        img_path = os.path.join(self.root, img_info["file_name"])
+        img = Image.open(img_path).convert("RGB")
 
-    for i, img_tensor in enumerate(images_tensor):
-        img = to_pil(img_tensor)
-        img.save(os.path.join(output_dir, f"{i:05d}.png"))
+        img_id = img_info["id"]
+        anns = self.ann_map.get(img_id, [])
 
-if __name__ == "__main__":
-    # load in LISA dataset
-    images_0, images_1, images_2, labels = data()
-    #view_images(images_2)
+        boxes = []
+        labels = []
+
+        for ann in anns:
+            x, y, w, h = ann["bbox"]
+            boxes.append(x, y, x+w, y+h)
+            labels.append(ann["category_id"]) # = 1 for traffic sign
+
+        boxes = torch.as_tensor(boxes, dtype=torch.float32)
+        labels = torch.as_tensor(labels, dtype=torch.int64)
+
+        target = {
+            "boxes": boxes,
+            "labels": labels,
+            "image_id": torch.tensor([img_id])
+        }
+
+        if self.transforms:
+            img = self.transforms(img)
+
+        return img, target
+
+"""
+References: https://towardsdatascience.com/how-to-work-with-object-detection-datasets-in-coco-format-9bf4fb5848a4/
+"""
