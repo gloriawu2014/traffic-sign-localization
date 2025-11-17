@@ -5,13 +5,28 @@ Dataset: https://www.vicos.si/resources/dfg/
 
 import torch
 import torchvision
-import torchvision.transforms as transforms
+import torchvision.transforms.functional as F_t
+from torchvision import transforms
+from torchvision.transforms import functional as F
 from torch.utils.data import DataLoader
 from pycocotools import mask as mask_utils
 import numpy as np
 import json
 import os
 from PIL import Image
+
+"""
+Class for resizing images for faster computatoin
+"""
+class ResizeTransform:
+    def __init__(self, max_size=512):
+        self.max_size = max_size
+
+    def __call__(self, img):
+        w, h = img.size
+        scale = self.max_size / min(h, w)
+        new_w, new_h = int(w * scale), int(h * scale)
+        return F.resize(img, (new_h, new_w))
 
 """
 Class for parsing annotations in COCO json format.
@@ -30,7 +45,7 @@ class COCOTrafficSigns(torch.utils.data.Dataset):
         
         if not os.path.isfile(annotation_file):
             raise FileNotFoundError(
-                f"[ERROR] Annotation file not found: '{annotation_file}"
+                f"[ERROR] Annotation file not found: '{annotation_file}'"
             )
         
         self.root = image_folder
@@ -72,7 +87,7 @@ class COCOTrafficSigns(torch.utils.data.Dataset):
         img = Image.open(img_path).convert("RGB")
 
         img_id = img_info["id"]
-        height, width = img_info["height"], img_info["width"]
+        orig_width, orig_height = img.size
         anns = self.ann_map.get(img_id, [])
 
         boxes = []
@@ -87,7 +102,7 @@ class COCOTrafficSigns(torch.utils.data.Dataset):
             seg = ann.get("segmentation", None)
             if seg is not None:
                 if isinstance(seg, list):
-                    rles = mask_utils.frPyObjects(seg, height, width)
+                    rles = mask_utils.frPyObjects(seg, orig_height, orig_width)
                     rle = mask_utils.merge(rles)
                 else:
                     rle = seg
@@ -110,7 +125,29 @@ class COCOTrafficSigns(torch.utils.data.Dataset):
         if masks:
             masks = torch.as_tensor(np.stack(masks, axis=0), dtype=torch.uint8) # [num_objs, H, W]
         else:
-            masks = torch.zeros((0, height, width), dtype=torch.uint8)
+            masks = torch.zeros((0, orig_height, orig_width), dtype=torch.uint8)
+
+        # resize
+        if self.transforms:
+            img = self.transforms(img)
+
+            new_height, new_width = img.shape[1], img.shape[2]
+            scale_x = new_width / orig_width
+            scale_y = new_height / orig_height
+
+            if boxes.shape[0] > 0:
+                boxes[:, [0, 2]] = boxes[:, [0, 2]] * scale_x
+                boxes[:, [1, 3]] = boxes[:, [1, 3]] * scale_y 
+
+            if masks.shape[0] > 0:
+                masks_resized = []
+                
+                for mask in masks:
+                    mask_pil = Image.fromarray(mask.numpy())
+                    mask_resized = F_t.resize(mask_pil, (new_height, new_width), interpolation=Image.NEAREST)
+                    masks_resized.append(torch.as_tensor(np.array(mask_resized), dtype=torch.uint8))
+
+                masks = torch.stack(masks_resized)
 
         target = {
             "boxes": boxes,
@@ -119,28 +156,46 @@ class COCOTrafficSigns(torch.utils.data.Dataset):
             "image_id": torch.tensor([img_id])
         }
 
-        if self.transforms:
-            img = self.transforms(img)
-
         return img, target
     
 def collate_fn(batch):
     return tuple(zip(*batch))
 
 def parse_DFG():
+    t_transforms = transforms.Compose([
+        ResizeTransform(max_size=512),
+        transforms.ToTensor()
+    ])
+
     testset = COCOTrafficSigns(
         image_folder="data/JPEGImages",
         annotation_file="data/DFG-tsd-annot-json/test.json",
-        transforms=transforms.ToTensor()
+        transforms=t_transforms
     )
     trainset = COCOTrafficSigns(
         image_folder="data/JPEGImages",
         annotation_file="data/DFG-tsd-annot-json/train.json",
-        transforms=transforms.ToTensor()
+        transforms=t_transforms
     )
 
-    testloader = DataLoader(testset, batch_size=2, shuffle=True, collate_fn=collate_fn)
-    trainloader = DataLoader(trainset, batch_size=2, shuffle=False, collate_fn=collate_fn)
+    img, target = trainset[0]
+    print(img.shape) #torch.Size([3, 1080, 1920])
+    exit()
+
+    testloader = DataLoader(
+        testset, 
+        batch_size=1, 
+        shuffle=True, 
+        collate_fn=collate_fn,
+        num_workers=4
+    )
+    trainloader = DataLoader(
+        trainset, 
+        batch_size=1, 
+        shuffle=False, 
+        collate_fn=collate_fn,
+        num_workers=4
+    )
 
     return trainloader, testloader
 

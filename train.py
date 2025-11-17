@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     train(model, trainloader, args.epochs, args.lr)
 
-    torch.save(model.state_dict(), "data/mask_rcnn_traffic_sign.pth")
+    torch.save(model, "data/mask_rcnn_traffic_sign.pth")
 
 """
 References:
