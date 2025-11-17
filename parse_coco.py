@@ -7,6 +7,8 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
+from pycocotools import mask as mask_utils
+import numpy as np
 import json
 import os
 from PIL import Image
@@ -70,22 +72,50 @@ class COCOTrafficSigns(torch.utils.data.Dataset):
         img = Image.open(img_path).convert("RGB")
 
         img_id = img_info["id"]
+        height, width = img_info["height"], img_info["width"]
         anns = self.ann_map.get(img_id, [])
 
         boxes = []
         labels = []
+        masks = []
 
         for ann in anns:
-            x, y, w, h = ann["bbox"]
-            boxes.append([x, y, x+w, y+h])
+            x, y, w_box, h_box = ann["bbox"]
+            boxes.append([x, y, x+w_box, y+h_box])
             labels.append(ann["category_id"]) # = 1 for traffic sign
 
-        boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        labels = torch.as_tensor(labels, dtype=torch.int64)
+            seg = ann.get("segmentation", None)
+            if seg is not None:
+                if isinstance(seg, list):
+                    rles = mask_utils.frPyObjects(seg, height, width)
+                    rle = mask_utils.merge(rles)
+                else:
+                    rle = seg
+                mask = mask_utils.decode(rle)
+                masks.append(mask)
+            else:
+                continue
+
+        # ensure that images with zero objects still produce tensors w/ correct shape
+        if boxes:
+            boxes = torch.as_tensor(boxes, dtype=torch.float32)
+        else:
+            boxes = torch.zeros((0, 4), dtype=torch.float32)
+
+        if labels:
+            labels = torch.as_tensor(labels, dtype=torch.int64)
+        else:
+            labels = torch.zeros((0,), dtype=torch.int64)
+
+        if masks:
+            masks = torch.as_tensor(np.stack(masks, axis=0), dtype=torch.uint8) # [num_objs, H, W]
+        else:
+            masks = torch.zeros((0, height, width), dtype=torch.uint8)
 
         target = {
             "boxes": boxes,
             "labels": labels,
+            "masks": masks,
             "image_id": torch.tensor([img_id])
         }
 
@@ -109,10 +139,31 @@ def parse_DFG():
         transforms=transforms.ToTensor()
     )
 
-    testloader = DataLoader(testset, batch_size=32, shuffle=True, collate_fn=collate_fn)
-    trainloader = DataLoader(trainset, batch_size=32, shuffle=False, collate_fn=collate_fn)
+    testloader = DataLoader(testset, batch_size=2, shuffle=True, collate_fn=collate_fn)
+    trainloader = DataLoader(trainset, batch_size=2, shuffle=False, collate_fn=collate_fn)
 
     return trainloader, testloader
+
+def count_classes():
+    """
+    Returns the number of object classes + 1
+    For this dataset, should be 200 + 1
+    """
+
+    with open("data/DFG-tsd-annot-json/test.json") as f:
+        data = json.load(f)
+    
+    num_obj_classes = len(data["categories"])
+
+    return num_obj_classes + 1
+
+if __name__ == "__main__":
+    ### for debugging purposes
+    trainloader, testloader = parse_DFG()
+    images, targets = next(iter(trainloader))
+    print("batch size", len(images))
+    print("first image shape:", images[0].shape)
+    print("first target:", targets[0])
 
 """
 References: https://towardsdatascience.com/how-to-work-with-object-detection-datasets-in-coco-format-9bf4fb5848a4/
