@@ -16,10 +16,10 @@ import os
 from PIL import Image
 
 """
-Class for resizing images for faster computatoin
+Class for resizing images for faster computation
 """
 class ResizeTransform:
-    def __init__(self, max_size=512):
+    def __init__(self, max_size=32):
         self.max_size = max_size
 
     def __call__(self, img):
@@ -163,7 +163,7 @@ def collate_fn(batch):
 
 def parse_DFG():
     t_transforms = transforms.Compose([
-        ResizeTransform(max_size=512),
+        ResizeTransform(max_size=32),
         transforms.ToTensor()
     ])
 
@@ -178,9 +178,8 @@ def parse_DFG():
         transforms=t_transforms
     )
 
-    img, target = trainset[0]
-    print(img.shape) #torch.Size([3, 1080, 1920])
-    exit()
+    # img, target = trainset[0]
+    # print(img.shape) #torch.Size([3, 1080, 1920])
 
     testloader = DataLoader(
         testset, 
