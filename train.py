@@ -20,7 +20,7 @@ def create_mask_rcnn(num_classes: int):
     Loads and modifies a pre-trained Mask R-CNN model with a specified
     number of classes and then returns the modified model.
     """
-    # load pretrained model
+    # load pretrained model - too large for local, train on HPC
     model = torchvision.models.detection.maskrcnn_resnet50_fpn(weights="DEFAULT")
 
     in_features = model.roi_heads.box_predictor.cls_score.in_features
