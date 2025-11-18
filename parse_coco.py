@@ -8,6 +8,7 @@ import torchvision
 import torchvision.transforms.functional as F_t
 from torchvision import transforms
 from torchvision.transforms import functional as F
+from torchvision.transforms import InterpolationMode
 from torch.utils.data import DataLoader
 from pycocotools import mask as mask_utils
 import numpy as np
@@ -26,7 +27,7 @@ class ResizeTransform:
         w, h = img.size
         scale = self.max_size / min(h, w)
         new_w, new_h = int(w * scale), int(h * scale)
-        return F.resize(img, (new_h, new_w))
+        return F_t.resize(img, (new_h, new_w), interpolation=InterpolationMode.BILINEAR)
 
 """
 Class for parsing annotations in COCO json format.
@@ -144,7 +145,7 @@ class COCOTrafficSigns(torch.utils.data.Dataset):
                 
                 for mask in masks:
                     mask_pil = Image.fromarray(mask.numpy())
-                    mask_resized = F_t.resize(mask_pil, (new_height, new_width), interpolation=Image.NEAREST)
+                    mask_resized = F_t.resize(mask_pil, (new_height, new_width), interpolation=InterpolationMode.NEAREST)
                     masks_resized.append(torch.as_tensor(np.array(mask_resized), dtype=torch.uint8))
 
                 masks = torch.stack(masks_resized)
