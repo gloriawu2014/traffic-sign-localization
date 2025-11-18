@@ -40,7 +40,7 @@ source .venv/bin/activate
 ```
 Train and evaluate the model:
 ```
-python3 train.py --partition=gpu-a5000-q
+sbatch train_slurm.sh
 ```
 
 # Development
