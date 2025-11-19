@@ -1,1 +1,21 @@
 Training model with 20 epochs and learning rate 0.001 --------------------
+Epoch 1/20	 Loss = 12938.8552
+Epoch 2/20	 Loss = 4224.0230
+Epoch 3/20	 Loss = 4075.6674
+Epoch 4/20	 Loss = 4070.2314
+Epoch 5/20	 Loss = 4068.2923
+Epoch 6/20	 Loss = 4067.1111
+Epoch 7/20	 Loss = 4066.5527
+Epoch 8/20	 Loss = 4065.7333
+Epoch 9/20	 Loss = 4065.1724
+Epoch 10/20	 Loss = 4064.7385
+Epoch 11/20	 Loss = 4064.4194
+Epoch 12/20	 Loss = 4064.1534
+Epoch 13/20	 Loss = 4063.7306
+Epoch 14/20	 Loss = 4063.5255
+Epoch 15/20	 Loss = 4063.3384
+Epoch 16/20	 Loss = 4063.0053
+Epoch 17/20	 Loss = 4063.0220
+Epoch 18/20	 Loss = 4062.7765
+Epoch 19/20	 Loss = 4062.4436
+Epoch 20/20	 Loss = 4062.3076
