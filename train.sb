@@ -6,6 +6,7 @@
 #SBATCH --mem=16G
 #SBATCH --time=04:00:00
 #SBATCH --output=train.out
+#SBATCH --error=train.err
 
 #sbatch train_slurm.sh
 
