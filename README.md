@@ -4,13 +4,13 @@ COSC 227 Final Project: Implementing, evaluating, and improving a localization m
 
 Chloe Lee, Isabella Niemi, Marah Sami, Gloria Wu
 
-# Setup (Local Machine)
+# Setup (HPC)
 
 From the root directory of the repository (`./traffic-sign-localization`), follow the subsequent steps to set everything up.
 
 Create and enter a virtual environment:
 ```
-python3 -m venv .venv
+python3 -m venv .venv --copies
 source .venv/bin/activate
 ```
 
@@ -25,23 +25,18 @@ cd data
 tar -xvjf JPEGImages.tar.bz2
 ```
 
-# Setup (HPC)
-```
-python3 -m venv .venv --copies
-source .venv/bin/activate
-pip install -r requirements-hpc.txt
-```
-
-# Run the Model (HPC)
+# Reproducing Results (HPC)
 
 Make sure you are in a virtual environment:
 ```
 source .venv/bin/activate
 ```
-Train and evaluate the model:
+Train and evaluate the model (this submits train.py):
 ```
-sbatch train_slurm.sh
+sbatch train.sb
 ```
+Assess model's performance on perturbations:
+
 
 # Development
 
