@@ -9,6 +9,7 @@ Dataset: https://www.vicos.si/resources/dfg/
 import torch
 import torchvision
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
+from torchvision.ops import box_iou
 import argparse
 from parse_coco import parse_DFG, count_classes
 from PIL import Image
@@ -37,7 +38,29 @@ def create_mask_rcnn(num_classes: int):
 
     return model
 
-def train(model, trainloader, num_epochs: int, lr: float):
+def accuracy(model, dataloader, iou: float):
+    model.eval()
+    aps = []
+
+    with torch.no_grad():
+        for images, targets in dataloader:
+            images = [img.to(device) for img in images]
+            outputs = model(images)
+
+            for output, target in zip(outputs, targets):
+                pred_boxes = output["boxes"].cpu()
+                true_boxes = target["boxes"]
+
+                # compute IoU
+                ious = box_iou(pred_boxes, true_boxes)
+                correct = (ious.max(dim=1).values > iou).sum().item()
+                total = len(true_boxes)
+
+                aps.append(correct/total)
+
+        return sum(aps) / len(aps)
+
+def train(model, trainloader, num_epochs: int, lr: float, iou: float):
     print(f"Training model with {num_epochs} epochs and learning rate {lr} " + "-" * 20)
 
     optimizer = torch.optim.Adam(model.parameters(), lr)
@@ -59,12 +82,17 @@ def train(model, trainloader, num_epochs: int, lr: float):
 
             total_loss += loss.item()
 
-        print(f"Epoch {epoch+1}/{num_epochs}\t Loss = {total_loss:.4f}")
+        acc = accuracy(model, trainloader, iou)
+
+        print(f"Epoch {epoch+1}/{num_epochs}\t Accuracy (IoU > {iou} = {acc:.4f}\t Loss = {total_loss:.4f}")
+
+        exit()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--epochs', type=int, default=20)
-    parser.add_argument('--lr', type=float, default=1e-3)
+    parser = argparse.ArgumentParser(description="Train a neural network to detect bounding boxes for traffic signs")
+    parser.add_argument('--epochs', type=int, default=20, help="Number of training epochs")
+    parser.add_argument('--lr', type=float, default=1e-3, help="Learning rate for gradient descent")
+    parser.add_argument('--iou', type=float, default=0.5, help="IoU tolerance for correct bounding boxes")
     args = parser.parse_args()
 
     num_classes = count_classes()
@@ -73,7 +101,7 @@ if __name__ == "__main__":
 
     trainloader, testloader = parse_DFG()
 
-    train(model, trainloader, args.epochs, args.lr)
+    train(model, trainloader, args.epochs, args.lr, args.iou)
 
     torch.save(model, "data/mask_rcnn_traffic_sign.pth")
 

@@ -1,1 +1,1 @@
-Downloading: "https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth" to /home/aanderson/.cache/torch/hub/checkpoints/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth
+Training model with 20 epochs and learning rate 0.001 --------------------
