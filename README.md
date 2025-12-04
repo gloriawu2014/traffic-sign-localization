@@ -44,3 +44,7 @@ Make sure to commit any dependencies you add:
 ```
 pip freeze > requirements.txt
 ```
+Format code with Ruff (from the root directory of the repository):
+```
+ruff format
+```
