@@ -42,46 +42,6 @@ def create_mask_rcnn(num_classes: int):
     return model
 
 
-def accuracy(model, dataloader, iou: float) -> float:
-    """
-    Returns the percentage of images with correct bounding boxes in the dataloader.
-    "Correct" is defined by having an IoU above the specified amoung, which is passed as an input parameter.
-    """
-    is_training = model.training
-    model.eval()
-    aps = []
-
-    with torch.no_grad():
-        for images, targets in dataloader:
-            images = [img.to(device) for img in images]
-            outputs = model(images)
-
-            for output, target in zip(outputs, targets):
-                pred_boxes = output["boxes"].cpu()
-                true_boxes = target["boxes"]
-
-                # edge case: no predicted boxes
-                if len(pred_boxes) == 0:
-                    aps.append(0.0)
-                    continue
-
-                # compute IoU
-                ious = box_iou(pred_boxes, true_boxes)
-                max_ious = ious.max(dim=0).values
-                correct = (max_ious > iou).sum().item()
-                total = len(true_boxes)
-
-                aps.append(correct / total)
-
-    if is_training:
-        model.train()
-
-    return sum(aps) / len(aps)
-
-
-### TODO: SHOW IMAGE WITH BOUNDING BOX
-
-
 def train(model, trainloader, num_epochs: int, lr: float, iou: float):
     """
     Takes in the number of epochs and learning rate as input parameters and trains the model.
@@ -110,9 +70,6 @@ def train(model, trainloader, num_epochs: int, lr: float, iou: float):
 
         print(f"Epoch {epoch + 1}/{num_epochs}\t Loss = {total_loss:.4f}")
 
-        # acc = accuracy(model, trainloader, iou)
-        # print(f"Accuracy (IoU > {iou}) = {acc:.4f}")
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -124,19 +81,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--lr", type=float, default=1e-3, help="Learning rate for gradient descent"
     )
-    parser.add_argument(
-        "--iou",
-        type=float,
-        default=0.5,
-        help="IoU tolerance for correct bounding boxes",
-    )
     args = parser.parse_args()
 
     num_classes = count_classes()
     model = create_mask_rcnn(num_classes)
     model.to(device)
 
-    trainloader, testloader = parse_DFG()
+    trainloader, _ = parse_DFG()
 
     train(model, trainloader, args.epochs, args.lr, args.iou)
 
