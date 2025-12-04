@@ -181,13 +181,13 @@ def parse_DFG():
     )
 
     testset = COCOTrafficSigns(
-        image_folder="data/JPEGImages",
-        annotation_file="data/DFG-tsd-annot-json/test.json",
+        image_folder="../data/JPEGImages",
+        annotation_file="../data/DFG-tsd-annot-json/test.json",
         transforms=t_transforms,
     )
     trainset = COCOTrafficSigns(
-        image_folder="data/JPEGImages",
-        annotation_file="data/DFG-tsd-annot-json/train.json",
+        image_folder="../data/JPEGImages",
+        annotation_file="../data/DFG-tsd-annot-json/train.json",
         transforms=t_transforms,
     )
 
@@ -210,7 +210,7 @@ def count_classes():
     For this dataset, should be 200 + 1
     """
 
-    with open("data/DFG-tsd-annot-json/test.json") as f:
+    with open("../data/DFG-tsd-annot-json/test.json") as f:
         data = json.load(f)
 
     num_obj_classes = len(data["categories"])

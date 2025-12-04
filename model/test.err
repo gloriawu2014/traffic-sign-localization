@@ -1,14 +1,11 @@
-/cm/local/apps/slurm/var/spool/job4413957/slurm_script: line 13: .venv/bin/activate: No such file or directory
 Traceback (most recent call last):
-  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/model/test.py", line 70, in <module>
-    _, testloader = parse_DFG()
-                    ~~~~~~~~~^^
-  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/model/parse_coco.py", line 183, in parse_DFG
-    testset = COCOTrafficSigns(
-        image_folder="data/JPEGImages",
-        annotation_file="data/DFG-tsd-annot-json/test.json",
-        transforms=t_transforms,
-    )
-  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/model/parse_coco.py", line 48, in __init__
-    raise FileNotFoundError(f"[ERROR] Image folder not found: '{image_folder}'")
-FileNotFoundError: [ERROR] Image folder not found: 'data/JPEGImages'
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/model/test.py", line 72, in <module>
+    model = torch.load("../data/mask_rcnn_traffic_sign_epoch_10.pth")
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/.venv/lib/python3.14/site-packages/torch/serialization.py", line 1529, in load
+    raise pickle.UnpicklingError(_get_wo_message(str(e))) from None
+_pickle.UnpicklingError: Weights only load failed. This file can still be loaded, to do so you have two options, [1mdo those steps only if you trust the source of the checkpoint[0m. 
+	(1) In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+	(2) Alternatively, to load with `weights_only=True` please check the recommended steps in the following error message.
+	WeightsUnpickler error: Unsupported global: GLOBAL torchvision.models.detection.mask_rcnn.MaskRCNN was not an allowed global by default. Please use `torch.serialization.add_safe_globals([torchvision.models.detection.mask_rcnn.MaskRCNN])` or the `torch.serialization.safe_globals([torchvision.models.detection.mask_rcnn.MaskRCNN])` context manager to allowlist this global if you trust this class/function.
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.

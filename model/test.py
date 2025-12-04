@@ -69,6 +69,6 @@ if __name__ == "__main__":
 
     _, testloader = parse_DFG()
 
-    model = torch.load("data/mask_rcnn_traffic_sign_epoch_10.pth")
+    model = torch.load("../data/mask_rcnn_traffic_sign_epoch_10.pth", weights_only=False)
 
     train(model, testloader, args.iou)
