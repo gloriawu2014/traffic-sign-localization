@@ -1,16 +1,16 @@
 #!/bin/bash
-#SBATCH --job-name=train
+#SBATCH --job-name=test
 #SBATCH --partition=gpu-a5000-q
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=04:00:00
-#SBATCH --output=train.out
-#SBATCH --error=train.err
+#SBATCH --output=test.out
+#SBATCH --error=test.err
 
-#sbatch train.sb
+#sbatch test.sb
 
 cd ../
 source .venv/bin/activate
 cd model
-python3 train.py
+python3 test.py
