@@ -9,8 +9,8 @@ Dataset: https://www.vicos.si/resources/dfg/
 import torch
 import torchvision
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
-from torchvision.ops import box_iou
 import argparse
+import time
 from parse_coco import parse_DFG, count_classes
 from PIL import Image
 
@@ -42,7 +42,7 @@ def create_mask_rcnn(num_classes: int):
     return model
 
 
-def train(model, trainloader, num_epochs: int, lr: float, iou: float):
+def train(model, trainloader, num_epochs: int, lr: float):
     """
     Takes in the number of epochs and learning rate as input parameters and trains the model.
     """
@@ -72,6 +72,8 @@ def train(model, trainloader, num_epochs: int, lr: float, iou: float):
 
 
 if __name__ == "__main__":
+    start = time.time()
+
     parser = argparse.ArgumentParser(
         description="Train a neural network to detect bounding boxes for traffic signs"
     )
@@ -89,9 +91,13 @@ if __name__ == "__main__":
 
     trainloader, _ = parse_DFG()
 
-    train(model, trainloader, args.epochs, args.lr, args.iou)
+    train(model, trainloader, args.epochs, args.lr)
 
     torch.save(model, "../data/mask_rcnn_traffic_sign.pth")
+
+    end = time.time()
+    elapsed = end - start
+    print(f"Time taken: {elapsed} seconds")
 
 """
 References:

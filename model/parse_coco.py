@@ -22,7 +22,7 @@ Class for resizing images for faster computation
 
 
 class ResizeTransform:
-    def __init__(self, max_size=32):
+    def __init__(self, max_size=512):
         self.max_size = max_size
 
     def __call__(self, img):
@@ -177,7 +177,7 @@ def collate_fn(batch):
 
 def parse_DFG():
     t_transforms = transforms.Compose(
-        [ResizeTransform(max_size=32), transforms.ToTensor()]
+        [ResizeTransform(max_size=512), transforms.ToTensor()]
     )
 
     testset = COCOTrafficSigns(

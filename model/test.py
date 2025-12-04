@@ -4,10 +4,38 @@ Script for testing our neural network trained in train.py.
 
 import torch
 import torchvision
+from torchvision.ops import box_iou
+from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 import argparse
-from parse_coco import parse_DFG
+import time
+from parse_coco import parse_DFG, count_classes
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def create_mask_rcnn(num_classes: int):
+    """
+    Loads and modifies a pre-trained Mask R-CNN model with a specified
+    number of classes and then returns the modified model.
+    """
+    # load pretrained model - too large for local, train on HPC
+    model = torchvision.models.detection.maskrcnn_resnet50_fpn(weights="DEFAULT")
+
+    in_features = model.roi_heads.box_predictor.cls_score.in_features
+    model.roi_heads.box_predictor = (
+        torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
+            in_features, num_classes
+        )
+    )
+
+    # input channels to mask predictor -> intermediate layer in mask head -> new mask prediction head
+    in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
+    hidden_layer = 256  # intermediate layer
+    model.roi_heads.mask_predictor = MaskRCNNPredictor(
+        in_features_mask, hidden_layer, num_classes
+    )
+
+    return model
 
 
 def accuracy(model, dataloader, iou: float) -> float:
@@ -23,6 +51,11 @@ def accuracy(model, dataloader, iou: float) -> float:
         for images, targets in dataloader:
             images = [img.to(device) for img in images]
             outputs = model(images)
+
+            print("Image size:", images[0].shape)
+            print("Ground truth boxes:", targets[0]["boxes"])
+            print("Predicted boxes:", outputs[0]["boxes"])
+            print("Scores:", outputs[0]["scores"])
 
             for output, target in zip(outputs, targets):
                 pred_boxes = output["boxes"].cpu()
@@ -51,11 +84,13 @@ def accuracy(model, dataloader, iou: float) -> float:
 
 
 def test(model, testloader, iou: float):
-    acc = accuracy(model, trainloader, iou)
+    acc = accuracy(model, testloader, iou)
     print(f"Accuracy (IoU > {iou}) = {acc:.4f}")
 
 
 if __name__ == "__main__":
+    start = time.time()
+
     parser = argparse.ArgumentParser(
         description="Test a neural network to detect bounding boxes for traffic signs"
     )
@@ -69,6 +104,15 @@ if __name__ == "__main__":
 
     _, testloader = parse_DFG()
 
-    model = torch.load("../data/mask_rcnn_traffic_sign_epoch_10.pth", weights_only=False)
+    num_classes = count_classes()
+    model = create_mask_rcnn(num_classes)
+    model = torch.load(
+        "../data/mask_rcnn_traffic_sign_size512_epoch10.pth", weights_only=False
+    )
+    model.to(device)
 
-    train(model, testloader, args.iou)
+    test(model, testloader, args.iou)
+
+    end = time.time()
+    elapsed = end - start
+    print(f"Time taken: {elapsed} seconds")

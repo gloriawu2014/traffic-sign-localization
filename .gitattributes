@@ -1,2 +1,4 @@
-data/mask_rcnn_traffic_sign_epoch_20.pth filter=lfs diff=lfs merge=lfs -text
-data/mask_rcnn_traffic_sign_epoch_10.pth filter=lfs diff=lfs merge=lfs -text
+data/mask_rcnn_traffic_sign_size32_epoch10.pth filter=lfs diff=lfs merge=lfs -text
+data/mask_rcnn_traffic_sign_size32_epoch20.pth filter=lfs diff=lfs merge=lfs -text
+data/mask_rcnn_traffic_sign_size512_epoch10.pth filter=lfs diff=lfs merge=lfs -text
+*.pth filter=lfs diff=lfs merge=lfs -text

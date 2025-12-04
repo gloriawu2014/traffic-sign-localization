@@ -31,9 +31,11 @@ Make sure you are in a virtual environment:
 ```
 source .venv/bin/activate
 ```
-Train and evaluate the model (this submits train.py):
+Train and test the model:
 ```
+cd model
 sbatch train.sb
+sbatch test.sb
 ```
 Assess model's performance on perturbations:
 
