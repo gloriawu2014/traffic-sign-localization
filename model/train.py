@@ -42,13 +42,17 @@ def create_mask_rcnn(num_classes: int):
     return model
 
 
-def train(model, trainloader, num_epochs: int, lr: float):
+def train(
+    model, trainloader, num_epochs: int, lr: float, momentum: float, weight_decay: float
+):
     """
     Takes in the number of epochs and learning rate as input parameters and trains the model.
     """
     print(f"Training model with {num_epochs} epochs and learning rate {lr} " + "-" * 20)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr)
+    optimizer = torch.optim.SGD(
+        model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay
+    )
 
     for epoch in range(num_epochs):
         model.train()
@@ -78,10 +82,14 @@ if __name__ == "__main__":
         description="Train a neural network to detect bounding boxes for traffic signs"
     )
     parser.add_argument(
-        "--epochs", type=int, default=10, help="Number of training epochs"
+        "--epochs", type=int, default=25, help="Number of training epochs"
     )
     parser.add_argument(
-        "--lr", type=float, default=1e-3, help="Learning rate for gradient descent"
+        "--lr", type=float, default=0.0025, help="Learning rate for gradient descent"
+    )
+    parser.add_argument("--momentum", type=float, default=0.9, help="Momentum for SGD")
+    parser.add_argument(
+        "--weight_decay", type=float, default=1e-4, help="Weight decay for SGD"
     )
     args = parser.parse_args()
 
@@ -91,10 +99,10 @@ if __name__ == "__main__":
 
     trainloader, _ = parse_DFG()
 
-    train(model, trainloader, args.epochs, args.lr)
+    train(model, trainloader, args.epochs, args.lr, args.momentum, args.weight_decay)
 
     torch.save(
-        model.state_dict(), "../data/mask_rcnn_traffic_sign_size512_epoch10_weights.pth"
+        model.state_dict(), "../data/mask_rcnn_traffic_sign_size512_epoch25_weights.pth"
     )
 
     end = time.time()

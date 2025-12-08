@@ -17,22 +17,6 @@ import os
 from PIL import Image
 
 """
-Class for resizing images for faster computation
-"""
-
-
-class ResizeTransform:
-    def __init__(self, max_size=512):
-        self.max_size = max_size
-
-    def __call__(self, img):
-        w, h = img.size
-        scale = self.max_size / min(h, w)
-        new_w, new_h = int(w * scale), int(h * scale)
-        return F_t.resize(img, (new_h, new_w), interpolation=InterpolationMode.BILINEAR)
-
-
-"""
 Class for parsing annotations in COCO json format.
 Requires a folder with all images and a json file with annotations.
 """
@@ -177,7 +161,11 @@ def collate_fn(batch):
 
 def parse_DFG():
     t_transforms = transforms.Compose(
-        [ResizeTransform(max_size=512), transforms.ToTensor()]
+        [
+            transforms.Resize(512),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
     )
 
     testset = COCOTrafficSigns(

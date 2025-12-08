@@ -47,13 +47,15 @@ def accuracy(model, dataloader, iou: float) -> float:
 
     with torch.no_grad():
         for images, targets in dataloader:
+            # print("dtype:", images[0].dtype)
+            # print("min/max:", images[0].min().item(), images[0].max().item())
+
             images = [img.to(device) for img in images]
             outputs = model(images)
 
-            print("Image size:", images[0].shape)
-            print("Ground truth boxes:", targets[0]["boxes"])
-            print("Predicted boxes:", outputs[0]["boxes"])
-            print("Scores:", outputs[0]["scores"])
+            # print("Image size:", images[0].shape)
+            # print("Ground truth boxes:", targets[0]["boxes"])
+            # print("Predicted boxes:", outputs[0]["boxes"])
 
             for output, target in zip(outputs, targets):
                 pred_boxes = output["boxes"].cpu()
@@ -61,16 +63,33 @@ def accuracy(model, dataloader, iou: float) -> float:
 
                 # edge case: no predicted boxes
                 if len(pred_boxes) == 0:
+                    print("no pred")
                     aps.append(0.0)
+                    continue
+
+                # edge case: no ground truth boxes
+                if len(true_boxes) == 0:
+                    print("no gt")
+                    aps.append(1.0)
                     continue
 
                 # compute IoU
                 ious = box_iou(pred_boxes, true_boxes)
-                max_ious = ious.max(dim=0).values
-                correct = (max_ious > iou).sum().item()
-                total = len(true_boxes)
+                matched = torch.zeros(len(true_boxes), dtype=torch.bool)
+                for i in range(len(pred_boxes)):
+                    iou_vals = ious[i]
+                    iou_vals = iou_vals.clone()
+                    iou_vals[matched] = -1
+                    max_iou, max_idx = iou_vals.max(0)
+                    if max_iou > iou:
+                        matched[max_idx] = True
 
-                aps.append(correct / total)
+                # max_ious = ious.max(dim=0).values
+                # correct = (max_ious > iou).sum().item()
+                # total = len(true_boxes)
+
+                # aps.append(correct / total)
+                aps.append(matched.sum().item() / len(true_boxes))
 
     return sum(aps) / len(aps)
 
@@ -92,7 +111,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--iou",
         type=float,
-        default=0.5,
+        default=0.25,
         help="IoU tolerance for correct bounding boxes",
     )
     args = parser.parse_args()
@@ -105,9 +124,18 @@ if __name__ == "__main__":
         "../data/mask_rcnn_traffic_sign_size512_epoch10_weights.pth",
         map_location=device,
     )
+    # print("Loaded weights keys:", len(state_dict.keys()))
+    # missing, unexpected = model.load_state_dict(state_dict, strict=False)
+    # print("Missing keys:", missing)
+    # print("Unexpected keys:", unexpected)
     model.load_state_dict(state_dict)
     model.to(device)
     model.eval()
+
+    # dummy = torch.rand(3, 512, 512).to(device)
+    # pred = model([dummy])[0]
+    # print("Dummy boxes:", pred['boxes'])
+    # print("Dummy scores:", pred['scores'])
 
     test(model, testloader, args.iou)
 

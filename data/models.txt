@@ -1,0 +1,5 @@
+size32_epoch10: full model, resized to 32 pixels, 10 epochs, optimizer = Adam
+size32_epoch20: full model, resized to 32 pixels, 20 epochs, optimizer = Adam
+size512_epoch10: full model, resized to 512 pixels, 10 epochs, optimizer = Adam
+size512_epoch10_weights: weights only, resized to 512 pixels, 10 epochs, optimizer = Adam
+size512_epoch25_weights: weights only, resized to 512 pixels using default resize in transfomrs(), 25 epochs, optimizer = SGD
