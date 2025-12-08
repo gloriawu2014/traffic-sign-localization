@@ -1,0 +1,12 @@
+Training model with 10 epochs and learning rate 0.001 --------------------
+Epoch 1/10	 Loss = 749681.9040
+Epoch 2/10	 Loss = 3775.0646
+Epoch 3/10	 Loss = 3513.4407
+Epoch 4/10	 Loss = 3505.3112
+Epoch 5/10	 Loss = 3503.0530
+Epoch 6/10	 Loss = 3501.8987
+Epoch 7/10	 Loss = 3501.0453
+Epoch 8/10	 Loss = 3500.3753
+Epoch 9/10	 Loss = 3499.7216
+Epoch 10/10	 Loss = 3499.4727
+Time taken: 4942.086024522781 seconds

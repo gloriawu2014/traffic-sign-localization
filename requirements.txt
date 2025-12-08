@@ -3,3 +3,4 @@ pycocotools>=2.0.10
 torch>=2.8.0
 torchvision>=0.23.0
 ruff>=0.14.7
+imagecorruptions>=1.1.2

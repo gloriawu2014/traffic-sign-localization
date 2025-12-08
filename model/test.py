@@ -43,8 +43,6 @@ def accuracy(model, dataloader, iou: float) -> float:
     Returns the percentage of images with correct bounding boxes in the dataloader.
     "Correct" is defined by having an IoU above the specified amoung, which is passed as an input parameter.
     """
-    is_training = model.training
-    model.eval()
     aps = []
 
     with torch.no_grad():
@@ -73,9 +71,6 @@ def accuracy(model, dataloader, iou: float) -> float:
                 total = len(true_boxes)
 
                 aps.append(correct / total)
-
-    if is_training:
-        model.train()
 
     return sum(aps) / len(aps)
 
@@ -106,10 +101,13 @@ if __name__ == "__main__":
 
     num_classes = count_classes()
     model = create_mask_rcnn(num_classes)
-    model = torch.load(
-        "../data/mask_rcnn_traffic_sign_size512_epoch10.pth", weights_only=False
+    state_dict = torch.load(
+        "../data/mask_rcnn_traffic_sign_size512_epoch10_weights.pth",
+        map_location=device,
     )
+    model.load_state_dict(state_dict)
     model.to(device)
+    model.eval()
 
     test(model, testloader, args.iou)
 

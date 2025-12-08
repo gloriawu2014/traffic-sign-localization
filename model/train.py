@@ -93,7 +93,9 @@ if __name__ == "__main__":
 
     train(model, trainloader, args.epochs, args.lr)
 
-    torch.save(model, "../data/mask_rcnn_traffic_sign.pth")
+    torch.save(
+        model.state_dict(), "../data/mask_rcnn_traffic_sign_size512_epoch10_weights.pth"
+    )
 
     end = time.time()
     elapsed = end - start
