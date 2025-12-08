@@ -38,7 +38,12 @@ sbatch train.sb
 sbatch test.sb
 ```
 Assess model's performance on perturbations:
-
+```
+cd perturbations
+python lighting.py
+python weather.py
+```
+Compare to other pre-trained models:
 
 # Development
 
