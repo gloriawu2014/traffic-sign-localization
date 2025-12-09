@@ -31,19 +31,19 @@ Make sure you are in a virtual environment:
 ```
 source .venv/bin/activate
 ```
-Train and test the model:
+**Train and test the model:**
 ```
 cd model
 sbatch train.sb
 sbatch test.sb
 ```
-Assess model's performance on perturbations:
+**Assess model's performance on perturbations:**
 ```
 cd perturbations
-python lighting.py
-python weather.py
+sbatch lighting.sb <CORRUPTION TYPE> <SEVERITY> <IOU> <NUM_TEST>
+sbatch weather.sb <LIGHTING TYPE> <SEVERITY> <IOU> <NUM_TEST>
 ```
-Compare to other pre-trained models:
+**Compare to other pre-trained models:**
 
 # Development
 

@@ -21,4 +21,4 @@ NUM_TEST=${4:-100}
 cd ../
 source .venv/bin/activate
 cd perturbations
-python3 lighting.py --iou $IOU --num_test $NUM_TEST
+python3 lighting.py --lighting_type $LIGHTING_TYPE --severity $SEVERITY --iou $IOU --num_test $NUM_TEST
