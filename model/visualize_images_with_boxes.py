@@ -13,6 +13,7 @@ import os
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 def create_mask_rcnn(num_classes: int):
     """
     Loads and modifies a pre-trained Mask R-CNN model with a specified
@@ -37,14 +38,15 @@ def create_mask_rcnn(num_classes: int):
 
     return model
 
+
 def visualize(model, dataloader, num_images: int, iou: float, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
-    
+
     with torch.no_grad():
         for i, (images, targets) in enumerate(dataloader):
             if i >= num_images:
                 break
-            
+
             img = images[0].cpu()
             target = targets[0]
 
@@ -62,7 +64,12 @@ def visualize(model, dataloader, num_images: int, iou: float, output_dir: str):
             for box in target["boxes"]:
                 x1, y1, x2, y2 = box
                 rect = patches.Rectangle(
-                    (x1, y1), x2-x1, y2-y1, linewidth=2, edgecolor='y', facecolor='none'
+                    (x1, y1),
+                    x2 - x1,
+                    y2 - y1,
+                    linewidth=2,
+                    edgecolor="y",
+                    facecolor="none",
                 )
                 ax.add_patch(rect)
 
@@ -70,24 +77,28 @@ def visualize(model, dataloader, num_images: int, iou: float, output_dir: str):
             pred_boxes = outputs[0]["boxes"].cpu()
             scores = outputs[0]["scores"].cpu()
             for box, score in zip(pred_boxes, scores):
-                if score < iou: # only show if iou threshold is reached
+                if score < iou:  # only show if iou threshold is reached
                     continue
                 x1, y1, x2, y2 = box
                 rect = patches.Rectangle(
-                    (x1, y1), x2-x1, y2-y1, linewidth=2, edgecolor='r', facecolor='none'
+                    (x1, y1),
+                    x2 - x1,
+                    y2 - y1,
+                    linewidth=2,
+                    edgecolor="r",
+                    facecolor="none",
                 )
                 ax.add_patch(rect)
 
             ax.set_title(f"Yellow: ground truth | Red: predicted")
             ax.axis("off")
-            save_path = os.path.join(output_dir, f"Image{i+1}.jpg")
-            plt.savefig(save_path, format='jpg', dpi=300)
+            save_path = os.path.join(output_dir, f"Image{i + 1}.jpg")
+            plt.savefig(save_path, format="jpg", dpi=300)
             plt.close()
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Display images with bounding boxes"
-    )
+    parser = argparse.ArgumentParser(description="Display images with bounding boxes")
     parser.add_argument(
         "--iou",
         type=float,
@@ -120,4 +131,12 @@ if __name__ == "__main__":
     model.to(device)
     model.eval()
 
-    visualize(model, testloader, args.num_images, args.iou, args.gt, args.pred, args.output_dir)
+    visualize(
+        model,
+        testloader,
+        args.num_images,
+        args.iou,
+        args.gt,
+        args.pred,
+        args.output_dir,
+    )

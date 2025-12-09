@@ -9,25 +9,27 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 import numpy as np
+
 if not hasattr(np, "float_"):
     np.float_ = (
         np.float64
     )  # need NumPy < 2.0, but don't want to change package/venv files
 import argparse
 import warnings
+
 warnings.filterwarnings(
-    "ignore",
-    category=UserWarning,
-    message="pkg_resources is deprecated as an API.*"
+    "ignore", category=UserWarning, message="pkg_resources is deprecated as an API.*"
 )
 from imagecorruptions import corrupt
 
 import sys
 import os
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from model.parse_coco import parse_DFG, count_classes
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def create_mask_rcnn(num_classes: int):
     """
@@ -53,25 +55,42 @@ def create_mask_rcnn(num_classes: int):
 
     return model
 
-def visualize_corruption(model, dataloader, corruption: str, severity: int, iou: float, num_images: int, output_dir: str):
+
+def visualize_corruption(
+    model,
+    dataloader,
+    corruption: str,
+    severity: int,
+    iou: float,
+    num_images: int,
+    output_dir: str,
+):
     os.makedirs(output_dir, exist_ok=True)
     mean = np.array([0.485, 0.456, 0.406])
-    std  = np.array([0.229, 0.224, 0.225])
-    
+    std = np.array([0.229, 0.224, 0.225])
+
     with torch.no_grad():
         for i, (images, targets) in enumerate(dataloader):
             if i >= num_images:
                 break
-            
+
             img = images[0].cpu()
             target = targets[0]
 
             img_np = img.permute(1, 2, 0).cpu().numpy()
             img_np = img_np * std + mean
             img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
-            corrupted_np = corrupt(img_np, corruption_name=corruption, severity=severity)
-            corrupted_tensor = torch.tensor(corrupted_np / 255.0, dtype=torch.float32).permute(2, 0, 1).to(device)
-            corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(device)
+            corrupted_np = corrupt(
+                img_np, corruption_name=corruption, severity=severity
+            )
+            corrupted_tensor = (
+                torch.tensor(corrupted_np / 255.0, dtype=torch.float32)
+                .permute(2, 0, 1)
+                .to(device)
+            )
+            corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(
+                device
+            )
 
             outputs = model([corrupted_tensor])[0]
 
@@ -85,7 +104,12 @@ def visualize_corruption(model, dataloader, corruption: str, severity: int, iou:
             for box in target["boxes"]:
                 x1, y1, x2, y2 = box
                 rect = patches.Rectangle(
-                    (x1, y1), x2-x1, y2-y1, linewidth=2, edgecolor='y', facecolor='none'
+                    (x1, y1),
+                    x2 - x1,
+                    y2 - y1,
+                    linewidth=2,
+                    edgecolor="y",
+                    facecolor="none",
                 )
                 ax.add_patch(rect)
 
@@ -93,18 +117,27 @@ def visualize_corruption(model, dataloader, corruption: str, severity: int, iou:
             pred_boxes = outputs["boxes"].cpu()
             scores = outputs["scores"].cpu()
             for box, score in zip(pred_boxes, scores):
-                if score < iou: # only show if iou threshold is reached
+                if score < iou:  # only show if iou threshold is reached
                     continue
                 x1, y1, x2, y2 = box
                 rect = patches.Rectangle(
-                    (x1, y1), x2-x1, y2-y1, linewidth=2, edgecolor='r', facecolor='none'
+                    (x1, y1),
+                    x2 - x1,
+                    y2 - y1,
+                    linewidth=2,
+                    edgecolor="r",
+                    facecolor="none",
                 )
                 ax.add_patch(rect)
 
-            ax.set_title(f"Corruption: {corruption}, Severity: {severity} | Yellow: ground truth | Red: predicted")
+            ax.set_title(
+                f"Corruption: {corruption}, Severity: {severity} | Yellow: ground truth | Red: predicted"
+            )
             ax.axis("off")
-            save_path = os.path.join(output_dir, f"Image_{corruption}_{severity}_{i+1}.jpg")
-            plt.savefig(save_path, format='jpg', dpi=300)
+            save_path = os.path.join(
+                output_dir, f"Image_{corruption}_{severity}_{i + 1}.jpg"
+            )
+            plt.savefig(save_path, format="jpg", dpi=300)
             plt.close()
 
 
@@ -153,4 +186,12 @@ if __name__ == "__main__":
     model.to(device)
     model.eval()
 
-    visualize_corruption(model, testloader, args.corruption, args.severity, args.iou, args.num_images, args.output_dir)
+    visualize_corruption(
+        model,
+        testloader,
+        args.corruption,
+        args.severity,
+        args.iou,
+        args.num_images,
+        args.output_dir,
+    )

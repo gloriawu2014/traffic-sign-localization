@@ -17,10 +17,9 @@ if not hasattr(np, "float_"):
         np.float64
     )  # need NumPy < 2.0, but don't want to change package/venv files
 import warnings
+
 warnings.filterwarnings(
-    "ignore",
-    category=UserWarning,
-    message="pkg_resources is deprecated as an API.*"
+    "ignore", category=UserWarning, message="pkg_resources is deprecated as an API.*"
 )
 from imagecorruptions import corrupt
 
@@ -63,7 +62,7 @@ def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
     num_clean = 0
     num_correct = 0
     mean = np.array([0.485, 0.456, 0.406])
-    std  = np.array([0.229, 0.224, 0.225])
+    std = np.array([0.229, 0.224, 0.225])
 
     with torch.no_grad():
         for images, targets in testloader:
@@ -91,9 +90,17 @@ def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
                     img_np = img.permute(1, 2, 0).cpu().numpy()
                 img_np = img_np * std + mean
                 img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
-                corrupted_np = corrupt(img_np, corruption_name=corruption, severity=severity)
-                corrupted_tensor = torch.tensor(corrupted_np / 255.0, dtype=torch.float32).permute(2, 0, 1).to(device)
-                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(device)
+                corrupted_np = corrupt(
+                    img_np, corruption_name=corruption, severity=severity
+                )
+                corrupted_tensor = (
+                    torch.tensor(corrupted_np / 255.0, dtype=torch.float32)
+                    .permute(2, 0, 1)
+                    .to(device)
+                )
+                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(
+                    device
+                )
                 corrupted_images.append(corrupted_tensor)
 
                 corrupted_outputs = model(corrupted_images)
@@ -165,5 +172,5 @@ if __name__ == "__main__":
 
     end = time.time()
     elapsed = end - start
-    #print(f"Time taken: {elapsed} seconds")
+    # print(f"Time taken: {elapsed} seconds")
     print(f"{args.corruption},{args.severity},{correct},{total},{accuracy},{elapsed}")
