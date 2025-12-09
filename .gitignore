@@ -209,3 +209,4 @@ __marimo__/
 data/JPEGImages
 data/lisa
 data/JPEGImages.tar.bz2
+ultralytics/.ruff_cache/
