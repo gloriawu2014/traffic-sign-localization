@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-data = pd.read_csv("weather_perturbations.csv")
+data = pd.read_csv("weather.out")
 
 data['severity'] = pd.to_numeric(data['severity'], errors='coerce')
 data['accuracy'] = pd.to_numeric(data['accuracy'], errors='coerce')
@@ -28,7 +28,6 @@ for ctype in corruption_types:
     plt.ylabel("Accuracy")
     plt.title(f"Accuracy vs Severity for: {ctype.capitalize()}")
     plt.xticks([1, 2, 3, 4, 5])
-    plt.ylim(0, 0.2)
     plt.grid(True)
     
     save_path = os.path.join(output_dir, f"{ctype}.jpg")

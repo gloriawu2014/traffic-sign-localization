@@ -214,7 +214,7 @@ ultralytics/.ruff_cache/
 *.zip
 *.tar.bz2
 ultralytics/JPEGImages
-ultralytics/
+newultralytics/dataset/images/train
 *.pth
 *.zip
 *.tar.bz2
