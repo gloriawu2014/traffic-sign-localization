@@ -1,3 +1,3 @@
-Evaluating model performance against fog perturbations with severity 5
-Number of correct predictions with IoU 0.5: 1 / 105 = 0.0095
-Time taken: 17.151047945022583 seconds
+Evaluating model performance against fog perturbations with severity 4
+Number of correct predictions with IoU 0.5: 9 / 101 = 0.0891
+Time taken: 18.60311484336853 seconds

@@ -1,23 +1,187 @@
 Evaluating model performance against snow perturbations with severity 1
 Number of correct predictions with IoU 0.5: 7 / 102 = 0.0686
 Time taken: 20.84640407562256 seconds
+Number of correct predictions with IoU 0.5: 5 / 100 = 0.0500
+Time taken: 19.202265739440918 seconds
+Number of correct predictions with IoU 0.5: 4 / 100 = 0.0400
+Time taken: 19.453134775161743 seconds
+Number of correct predictions with IoU 0.5: 10 / 101 = 0.0990
+Time taken: 19.158528566360474 seconds
+Number of correct predictions with IoU 0.5: 2 / 100 = 0.0200
+Time taken: 18.282722234725952 seconds
 
 Evaluating model performance against frost perturbations with severity 1
 Number of correct predictions with IoU 0.5: 9 / 101 = 0.0891
 Time taken: 17.947065114974976 seconds
+Number of correct predictions with IoU 0.5: 6 / 102 = 0.0588
+Time taken: 16.156387090682983 seconds
+Number of correct predictions with IoU 0.5: 7 / 101 = 0.0693
+Time taken: 16.161659955978394 seconds
+Number of correct predictions with IoU 0.5: 10 / 101 = 0.0990
+Time taken: 16.977343797683716 seconds
+Number of correct predictions with IoU 0.5: 15 / 102 = 0.1471
+Time taken: 18.284363985061646 seconds
 
 Evaluating model performance against fog perturbations with severity 1
 Number of correct predictions with IoU 0.5: 4 / 100 = 0.0400
 Time taken: 17.382279872894287 seconds
+Number of correct predictions with IoU 0.5: 12 / 101 = 0.1188
+Time taken: 18.884965419769287 seconds
+Number of correct predictions with IoU 0.5: 6 / 101 = 0.0594
+Time taken: 18.256436586380005 seconds
+Number of correct predictions with IoU 0.5: 8 / 102 = 0.0784
+Time taken: 17.826746702194214 seconds
+Number of correct predictions with IoU 0.5: 8 / 100 = 0.0800
+Time taken: 17.77592658996582 seconds
+
+------------------------------------------------------------
 
 Evaluating model performance against snow perturbations with severity 5
 Number of correct predictions with IoU 0.5: 0 / 100 = 0.0000
 Time taken: 20.305898189544678 seconds
+Number of correct predictions with IoU 0.5: 0 / 101 = 0.0000
+Time taken: 19.21892237663269 seconds
+Number of correct predictions with IoU 0.5: 0 / 101 = 0.0000
+Time taken: 18.774275064468384 seconds
+Number of correct predictions with IoU 0.5: 2 / 100 = 0.0200
+Time taken: 19.698399543762207 seconds
+Number of correct predictions with IoU 0.5: 1 / 100 = 0.0100
+Time taken: 18.580403089523315 seconds
 
 Evaluating model performance against frost perturbations with severity 5
 Number of correct predictions with IoU 0.5: 2 / 102 = 0.0196
 Time taken: 18.46338415145874 seconds
+Number of correct predictions with IoU 0.5: 3 / 100 = 0.0300
+Time taken: 17.90075707435608 seconds
+Number of correct predictions with IoU 0.5: 9 / 101 = 0.0891
+Time taken: 17.85366153717041 seconds
+Number of correct predictions with IoU 0.5: 2 / 101 = 0.0198
+Time taken: 16.527215480804443 seconds
+Number of correct predictions with IoU 0.5: 4 / 100 = 0.0400
+Time taken: 17.135793447494507 seconds
 
 Evaluating model performance against fog perturbations with severity 5
 Number of correct predictions with IoU 0.5: 1 / 105 = 0.0095
 Time taken: 17.151047945022583 seconds
+Number of correct predictions with IoU 0.5: 5 / 100 = 0.0500
+Time taken: 17.827449560165405 seconds
+Number of correct predictions with IoU 0.5: 6 / 100 = 0.0600
+Time taken: 17.41091513633728 seconds
+Number of correct predictions with IoU 0.5: 7 / 100 = 0.0700
+Time taken: 18.1590256690979 seconds
+Number of correct predictions with IoU 0.5: 6 / 100 = 0.0600
+Time taken: 17.705087661743164 seconds
+
+------------------------------------------------------------
+
+Evaluating model performance against snow perturbations with severity 2
+Number of correct predictions with IoU 0.5: 2 / 103 = 0.0194
+Time taken: 17.64646553993225 seconds
+Number of correct predictions with IoU 0.5: 0 / 100 = 0.0000
+Time taken: 19.389444828033447 seconds
+Number of correct predictions with IoU 0.5: 1 / 100 = 0.0100
+Time taken: 18.876270294189453 seconds
+Number of correct predictions with IoU 0.5: 1 / 101 = 0.0099
+Time taken: 19.572797775268555 seconds
+Number of correct predictions with IoU 0.5: 1 / 102 = 0.0098
+Time taken: 19.569544076919556 seconds
+
+Evaluating model performance against frost perturbations with severity 2
+Number of correct predictions with IoU 0.5: 4 / 100 = 0.0400
+Time taken: 16.875221967697144 seconds
+Number of correct predictions with IoU 0.5: 8 / 102 = 0.0784
+Time taken: 16.50049638748169 seconds
+Number of correct predictions with IoU 0.5: 5 / 101 = 0.0495
+Time taken: 16.91763973236084 seconds
+Number of correct predictions with IoU 0.5: 6 / 102 = 0.0588
+Time taken: 16.58076548576355 seconds
+Number of correct predictions with IoU 0.5: 6 / 100 = 0.0600
+Time taken: 17.260817050933838 seconds
+
+Evaluating model performance against fog perturbations with severity 2
+Number of correct predictions with IoU 0.5: 2 / 100 = 0.0200
+Time taken: 17.5249445438385 seconds
+Number of correct predictions with IoU 0.5: 8 / 103 = 0.0777
+Time taken: 18.01539397239685 seconds
+Number of correct predictions with IoU 0.5: 6 / 102 = 0.0588
+Time taken: 17.226435899734497 seconds
+Number of correct predictions with IoU 0.5: 4 / 100 = 0.0400
+Time taken: 18.47443723678589 seconds
+Number of correct predictions with IoU 0.5: 7 / 101 = 0.0693
+Time taken: 19.35804510116577 seconds
+
+------------------------------------------------------------
+
+Evaluating model performance against snow perturbations with severity 3
+Number of correct predictions with IoU 0.5: 2 / 101 = 0.0198
+Time taken: 20.63938069343567 seconds
+Number of correct predictions with IoU 0.5: 2 / 100 = 0.0200
+Time taken: 21.154248476028442 seconds
+Number of correct predictions with IoU 0.5: 2 / 100 = 0.0200
+Time taken: 20.802090406417847 seconds
+Number of correct predictions with IoU 0.5: 4 / 105 = 0.0381
+Time taken: 20.625914812088013 seconds
+Number of correct predictions with IoU 0.5: 2 / 100 = 0.0200
+Time taken: 19.394962072372437 seconds
+
+Evaluating model performance against frost perturbations with severity 3
+Number of correct predictions with IoU 0.5: 3 / 100 = 0.0300
+Time taken: 17.982541799545288 seconds
+Number of correct predictions with IoU 0.5: 6 / 103 = 0.0583
+Time taken: 18.11733889579773 seconds
+Number of correct predictions with IoU 0.5: 8 / 100 = 0.0800
+Time taken: 18.25919008255005 seconds
+Number of correct predictions with IoU 0.5: 3 / 101 = 0.0297
+Time taken: 19.497169256210327 seconds
+Number of correct predictions with IoU 0.5: 7 / 100 = 0.0700
+Time taken: 19.975000858306885 seconds
+
+Evaluating model performance against fog perturbations with severity 3
+Number of correct predictions with IoU 0.5: 1 / 101 = 0.0099
+Time taken: 17.856115579605103 seconds
+Number of correct predictions with IoU 0.5: 4 / 101 = 0.0396
+Time taken: 18.465230703353882 seconds
+Number of correct predictions with IoU 0.5: 3 / 101 = 0.0297
+Time taken: 18.96288537979126 seconds
+Number of correct predictions with IoU 0.5: 6 / 101 = 0.0594
+Time taken: 18.947336673736572 seconds
+Number of correct predictions with IoU 0.5: 4 / 101 = 0.0396
+Time taken: 18.72982168197632 seconds
+
+------------------------------------------------------------
+
+Evaluating model performance against snow perturbations with severity 4
+Number of correct predictions with IoU 0.5: 3 / 100 = 0.0300
+Time taken: 19.284425973892212 seconds
+Number of correct predictions with IoU 0.5: 1 / 101 = 0.0099
+Time taken: 19.829631090164185 seconds
+Number of correct predictions with IoU 0.5: 2 / 101 = 0.0198
+Time taken: 20.09646511077881 seconds
+Number of correct predictions with IoU 0.5: 0 / 103 = 0.0000
+Time taken: 21.66516923904419 seconds
+Number of correct predictions with IoU 0.5: 6 / 101 = 0.0594
+Time taken: 20.97678256034851 seconds
+
+Evaluating model performance against frost perturbations with severity 4
+Number of correct predictions with IoU 0.5: 3 / 102 = 0.0294
+Time taken: 17.770245790481567 seconds
+Number of correct predictions with IoU 0.5: 2 / 103 = 0.0194
+Time taken: 18.389140129089355 seconds
+Number of correct predictions with IoU 0.5: 5 / 100 = 0.0500
+Time taken: 17.96422576904297 seconds
+Number of correct predictions with IoU 0.5: 4 / 100 = 0.0400
+Time taken: 18.33564019203186 seconds
+Number of correct predictions with IoU 0.5: 10 / 100 = 0.1000
+Time taken: 19.423086881637573 seconds
+
+Evaluating model performance against fog perturbations with severity 4
+Number of correct predictions with IoU 0.5: 9 / 101 = 0.0891
+Time taken: 18.60311484336853 seconds
+Number of correct predictions with IoU 0.5: 9 / 100 = 0.0900
+Time taken: 19.54947328567505 seconds
+Number of correct predictions with IoU 0.5: 3 / 101 = 0.0297
+Time taken: 19.3857684135437 seconds
+Number of correct predictions with IoU 0.5: 3 / 101 = 0.0297
+Time taken: 20.184128046035767 seconds
+Number of correct predictions with IoU 0.5: 7 / 100 = 0.0700
+Time taken: 19.821020364761353 seconds
