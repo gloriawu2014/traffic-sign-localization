@@ -7,10 +7,22 @@ import torch
 import torchvision
 from torchvision.ops import box_iou
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
-from imagecorruptions import corrupt
-from parse_coco import parse_DFG, count_classes
 import argparse
 import time
+import numpy as np
+
+if not hasattr(np, "float_"):
+    np.float_ = (
+        np.float64
+    )  # need NumPy < 2.0, but don't want to change package/venv files
+from imagecorruptions import corrupt
+
+
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from model.parse_coco import parse_DFG, count_classes
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -44,61 +56,58 @@ def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
     num_clean = 0
     num_correct = 0
     with torch.no_grad():
-        for image, target in dataloader:
-            if num_clean == num_test:
+        for images, targets in testloader:
+            if num_clean >= num_test:
                 break
 
-            image = [img.to(device) for img in image]
-            output = model(image)
+            images = [img.to(device) for img in images]
+            outputs = model(images)
 
-            ### only corrupt clean images
-            pred_boxes = output["boxes"].cpu()
-            true_boxes = target["boxes"]
+            for output, target in zip(outputs, targets):
+                pred_boxes = output["boxes"].cpu()
+                true_boxes = target["boxes"]
 
-            # edge case: no predicted boxes
-            if len(pred_boxes) == 0:
-                continue
-
-            # edge case: no ground truth boxes
-            if len(true_boxes) == 0:
-                continue
-
-            # compute IoU
-            ious = box_iou(pred_boxes, true_boxes)
-            matched = torch.zeros(len(true_boxes), dtype=torch.bool)
-            for i in range(len(pred_boxes)):
-                iou_vals = ious[i]
-                iou_vals = iou_vals.clone()
-                iou_vals[matched] = -1
-                max_iou, max_idx = iou_vals.max(0)
-                if max_iou > iou:
-                    matched[max_idx] = True
-                    num_clean += 1
+                if len(pred_boxes) == 0 or len(true_boxes) == 0:
                     continue
 
-            corrupted_image = corrupt(image, corruption_name=corruption, severity=1)
-            corrupted_output = model(corrupted_image)
+                # compute IoU
+                ious = box_iou(pred_boxes, true_boxes)
+                max_iou_per_gt, _ = ious.max(0)
+                num_clean += (max_iou_per_gt > iou).sum().item()
 
-            corrupt_boxes = output["boxes"].cpu()
+                corrupted_images = []
+                for img in images:
+                    # corrupt() expects NumPy array of uint8
+                    np_img = img.permute(1, 2, 0).cpu().numpy()
+                    np_img = (np_img * 255).astype(np.uint8)
+                    corrupted_np = corrupt(
+                        np_img, corruption_name=corruption, severity=severity
+                    )
+                    corrupted_tensor = (
+                        torch.tensor(corrupted_np / 255.0, dtype=torch.float32)
+                        .permute(2, 0, 1)
+                        .to(device)
+                    )
+                    corrupted_images.append(corrupted_tensor)
 
-            # edge case: no predicted boxes
-            if len(corrupt_boxes) == 0:
-                continue
+                corrupted_outputs = model(corrupted_images)
 
-            # compute IoU
-            ious = box_iou(corrupt_boxes, true_boxes)
-            matched = torch.zeros(len(true_boxes), dtype=torch.bool)
-            for i in range(len(pred_boxes)):
-                iou_vals = ious[i]
-                iou_vals = iou_vals.clone()
-                iou_vals[matched] = -1
-                max_iou, max_idx = iou_vals.max(0)
-                if max_iou > iou:
-                    matched[max_idx] = True
-                    num_correct += 1
+                for corrupted_output, target in zip(corrupted_outputs, targets):
+                    corrupt_boxes = corrupted_output["boxes"].cpu()
+                    true_boxes = target["boxes"]
+
+                if len(corrupt_boxes) == 0 or len(true_boxes) == 0:
                     continue
 
-        print(f"Number of correct predictions with IoU {iou}: {num_correct} / {num_clean} = {num_correct/num_clean:.4f}")
+                # compute IoU
+                ious = box_iou(corrupt_boxes, true_boxes)
+                max_iou_per_gt_corrupt, _ = ious.max(0)
+                num_correct += (max_iou_per_gt_corrupt > iou).sum().item()
+
+        accuracy = num_correct / num_clean if num_clean > 0 else 0.0
+        print(
+            f"Number of correct predictions with IoU {iou}: {num_correct} / {num_clean} = {accuracy:.4f}"
+        )
 
 
 if __name__ == "__main__":
@@ -117,12 +126,14 @@ if __name__ == "__main__":
         "--corruption",
         type=str,
         default="snow",
-        description="Type of weather perturbation: snow, frost, fog",
+        help="Type of weather perturbation: snow, frost, fog",
     )
     parser.add_argument(
-        "--severity", type=int, default=1, description="Severity of corruption"
+        "--severity", type=int, default=1, help="Severity of corruption"
     )
-    parser.add_argument("--num_test", type=int, default=20, description="Number of images to corrupt")
+    parser.add_argument(
+        "--num_test", type=int, default=100, help="Number of images to corrupt"
+    )
     args = parser.parse_args()
 
     _, testloader = parse_DFG()
@@ -137,7 +148,13 @@ if __name__ == "__main__":
     model.to(device)
     model.eval()
 
-    evaluate_corrupt(model, testloader, args.iou, args.corruption, args.severity, args.num_test)
+    print(
+        f"Evaluating model performance against {args.corruption} perturbations with severity {args.severity}"
+    )
+
+    evaluate_corrupt(
+        model, testloader, args.iou, args.corruption, args.severity, args.num_test
+    )
 
     end = time.time()
     elapsed = end - start

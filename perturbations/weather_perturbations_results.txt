@@ -1,0 +1,23 @@
+Evaluating model performance against snow perturbations with severity 1
+Number of correct predictions with IoU 0.5: 7 / 102 = 0.0686
+Time taken: 20.84640407562256 seconds
+
+Evaluating model performance against frost perturbations with severity 1
+Number of correct predictions with IoU 0.5: 9 / 101 = 0.0891
+Time taken: 17.947065114974976 seconds
+
+Evaluating model performance against fog perturbations with severity 1
+Number of correct predictions with IoU 0.5: 4 / 100 = 0.0400
+Time taken: 17.382279872894287 seconds
+
+Evaluating model performance against snow perturbations with severity 5
+Number of correct predictions with IoU 0.5: 0 / 100 = 0.0000
+Time taken: 20.305898189544678 seconds
+
+Evaluating model performance against frost perturbations with severity 5
+Number of correct predictions with IoU 0.5: 2 / 102 = 0.0196
+Time taken: 18.46338415145874 seconds
+
+Evaluating model performance against fog perturbations with severity 5
+Number of correct predictions with IoU 0.5: 1 / 105 = 0.0095
+Time taken: 17.151047945022583 seconds

@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --job-name=weather
+#SBATCH --partition=gpu-a5000-q
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --time=4:00:00
+#SBATCH --output=weather.out
+#SBATCH --error=weather.err
+
+#sbatch weather.sb <corruption> <severity> <iou> <num_test>
+
+CORRUPTION=${1:-snow}
+# OPTIONS: snow, frost, fog
+
+SEVERITY=${2:-1}
+# OPTIONS: 1-5
+
+IOU=${3:-0.5}
+
+NUM_TEST=${4:-100}
+
+cd ../
+source .venv/bin/activate
+cd perturbations
+python3 weather.py --corruption $CORRUPTION --severity $SEVERITY --iou $IOU --num_test $NUM_TEST

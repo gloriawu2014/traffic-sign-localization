@@ -1,0 +1,22 @@
+#!/bin/bash
+#SBATCH --job-name=lighting
+#SBATCH --partition=gpu-a5000-q
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --time=4:00:00
+#SBATCH --output=lighting.out
+#SBATCH --error=lighting.err
+
+#sbatch lighting.sb <iou> <num_test>
+
+IOU=${1:-0.5}
+
+NUM_TEST=${2:-100}
+
+# ADD ANY OTHER COMMAND-LINE ARGUMENTS HERE
+
+cd ../
+source .venv/bin/activate
+cd perturbations
+python3 lighting.py --iou $IOU --num_test $NUM_TEST

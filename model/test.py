@@ -63,13 +63,13 @@ def accuracy(model, dataloader, iou: float) -> float:
 
                 # edge case: no predicted boxes
                 if len(pred_boxes) == 0:
-                    #print("no pred")
+                    # print("no pred")
                     aps.append(0.0)
                     continue
 
                 # edge case: no ground truth boxes
                 if len(true_boxes) == 0:
-                    #print("no gt")
+                    # print("no gt")
                     aps.append(1.0)
                     continue
 
@@ -99,7 +99,7 @@ def accuracy(model, dataloader, iou: float) -> float:
 
 def test(model, testloader, iou: float):
     acc = accuracy(model, testloader, iou)
-    print(f"Accuracy (IoU > {iou}) = {100*acc:.4f}%")
+    print(f"Accuracy (IoU > {iou}) = {100 * acc:.4f}%")
 
 
 if __name__ == "__main__":
