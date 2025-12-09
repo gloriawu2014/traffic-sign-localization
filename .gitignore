@@ -218,3 +218,4 @@ newultralytics/dataset/images/train
 *.pth
 *.zip
 *.tar.bz2
+ultralytics/dataset/images/train
