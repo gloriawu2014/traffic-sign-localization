@@ -1,6 +1,8 @@
 # traffic-sign-localization
 
-COSC 227 Final Project: Implementing, evaluating, and improving a localization model for detecting traffic signs
+COSC 227 Final Project: Implementing, evaluating, and improving a localization model for detecting traffic signs.
+
+This project uses the DFG dataset for training and testing: https://www.vicos.si/resources/dfg/
 
 Chloe Lee, Isabella Niemi, Marah Sami, Gloria Wu
 
@@ -25,21 +27,17 @@ cd data
 tar -xvjf JPEGImages.tar.bz2
 ```
 
-# Reproducing Results (HPC)
+# Layout Overview
 
-**Train and test the model:**
+**Instructions on reproducing results are included in README.mds in the following folders**
+
 ```
-cd model
-sbatch train.sb
-sbatch test.sb
+├── data/                       # All data and trained models
+├── deliverables/               # Project deliverables
+├── model/                      # Training and evaluation of model on DFG dataset
+├── newultralytics/             # Testing on YOLO model
+├── perturbations/              # Evaluation of safety specifications on trained model
 ```
-**Assess model's performance on perturbations:**
-```
-cd perturbations
-sbatch lighting.sb <CORRUPTION TYPE> <SEVERITY> <IOU> <NUM_TEST>
-sbatch weather.sb <LIGHTING TYPE> <SEVERITY> <IOU> <NUM_TEST>
-```
-**Compare to other pre-trained models:**
 
 # Development
 

@@ -10,7 +10,9 @@
 
 #sbatch test.sb
 
+IOU=${1:-0.5}
+
 cd ../
 source .venv/bin/activate
 cd model
-python3 test.py
+python3 test.py --iou $IOU

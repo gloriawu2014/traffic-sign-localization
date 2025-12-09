@@ -47,15 +47,8 @@ def accuracy(model, dataloader, iou: float) -> float:
 
     with torch.no_grad():
         for images, targets in dataloader:
-            # print("dtype:", images[0].dtype)
-            # print("min/max:", images[0].min().item(), images[0].max().item())
-
             images = [img.to(device) for img in images]
             outputs = model(images)
-
-            # print("Image size:", images[0].shape)
-            # print("Ground truth boxes:", targets[0]["boxes"])
-            # print("Predicted boxes:", outputs[0]["boxes"])
 
             for output, target in zip(outputs, targets):
                 pred_boxes = output["boxes"].cpu()
@@ -84,11 +77,6 @@ def accuracy(model, dataloader, iou: float) -> float:
                     if max_iou > iou:
                         matched[max_idx] = True
 
-                # max_ious = ious.max(dim=0).values
-                # correct = (max_ious > iou).sum().item()
-                # total = len(true_boxes)
-
-                # aps.append(correct / total)
                 aps.append(matched.sum().item() / len(true_boxes))
 
     return sum(aps) / len(aps)
@@ -124,18 +112,10 @@ if __name__ == "__main__":
         "../data/final_model.pth",
         map_location=device,
     )
-    # print("Loaded weights keys:", len(state_dict.keys()))
-    # missing, unexpected = model.load_state_dict(state_dict, strict=False)
-    # print("Missing keys:", missing)
-    # print("Unexpected keys:", unexpected)
+
     model.load_state_dict(state_dict)
     model.to(device)
     model.eval()
-
-    # dummy = torch.rand(3, 512, 512).to(device)
-    # pred = model([dummy])[0]
-    # print("Dummy boxes:", pred['boxes'])
-    # print("Dummy scores:", pred['scores'])
 
     test(model, testloader, args.iou)
 

@@ -10,7 +10,10 @@
 
 #sbatch train.sb
 
+EPOCH=${1:-25}
+LR=${2:-0.0025}
+
 cd ../
 source .venv/bin/activate
 cd model
-python3 train.py
+python3 train.py --epochs $EPOCH --lr $LR
