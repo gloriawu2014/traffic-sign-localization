@@ -2,7 +2,7 @@ task: detect
 mode: train
 model: yolo11n.yaml
 data: dfg.yaml
-epochs: 100
+epochs: 20
 time: null
 patience: 100
 batch: 16
