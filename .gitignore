@@ -213,3 +213,8 @@ ultralytics/.ruff_cache/
 *.pth
 *.zip
 *.tar.bz2
+ultralytics/JPEGImages
+ultralytics/
+*.pth
+*.zip
+*.tar.bz2
