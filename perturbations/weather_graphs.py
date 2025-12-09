@@ -19,7 +19,7 @@ os.makedirs(output_dir, exist_ok=True)
 for ctype in corruption_types:
     subset = data[data['type'] == ctype]
 
-    avg_accuracy = subset.groupby('severity')['accuracy'].mean()
+    avg_accuracy = 100*subset.groupby('severity')['accuracy'].mean()
 
     plt.figure(figsize=(10,6))
     plt.plot(avg_accuracy.index, avg_accuracy.values, marker='o', label=ctype.capitalize())
