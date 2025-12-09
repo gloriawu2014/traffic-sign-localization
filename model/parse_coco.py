@@ -17,6 +17,22 @@ import os
 from PIL import Image
 
 """
+Class for resizing images for faster computatoin
+"""
+
+
+class ResizeTransform:
+    def __init__(self, max_size=512):
+        self.max_size = max_size
+
+    def __call__(self, img):
+        w, h = img.size
+        scale = self.max_size / min(h, w)
+        new_w, new_h = int(w * scale), int(h * scale)
+        return F.resize(img, (new_h, new_w))
+
+
+"""
 Class for parsing annotations in COCO json format.
 Requires a folder with all images and a json file with annotations.
 """
@@ -44,6 +60,16 @@ class COCOTrafficSigns(torch.utils.data.Dataset):
 
         self.images = data["images"]
         self.annotations = data["annotations"]
+
+        categories = data["categories"]
+        orig_cat_ids = sorted([cat["id"] for cat in categories])
+
+        self.cat_id_to_contiguous = {
+            orig_id: i + 1 for i, orig_id in enumerate(orig_cat_ids)
+        }
+
+        # print("[INFO] category ID mapping:")
+        # print(self.cat_id_to_contiguous)
 
         missing_images = []
         for img in self.images:
@@ -85,7 +111,9 @@ class COCOTrafficSigns(torch.utils.data.Dataset):
         for ann in anns:
             x, y, w_box, h_box = ann["bbox"]
             boxes.append([x, y, x + w_box, y + h_box])
-            labels.append(ann["category_id"])  # = 1 for traffic sign
+            original_cat_id = ann["category_id"]
+            remapped_cat_id = self.cat_id_to_contiguous[original_cat_id]
+            labels.append(remapped_cat_id)
 
             seg = ann.get("segmentation", None)
             if seg is not None:
@@ -162,7 +190,7 @@ def collate_fn(batch):
 def parse_DFG():
     t_transforms = transforms.Compose(
         [
-            transforms.Resize(512),
+            ResizeTransform(max_size=512),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]

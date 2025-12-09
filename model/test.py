@@ -111,7 +111,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--iou",
         type=float,
-        default=0.25,
+        default=0.5,
         help="IoU tolerance for correct bounding boxes",
     )
     args = parser.parse_args()
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     num_classes = count_classes()
     model = create_mask_rcnn(num_classes)
     state_dict = torch.load(
-        "../data/mask_rcnn_traffic_sign_size512_epoch10_weights.pth",
+        "../data/final_model.pth",
         map_location=device,
     )
     # print("Loaded weights keys:", len(state_dict.keys()))

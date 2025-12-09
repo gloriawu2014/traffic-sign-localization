@@ -1,0 +1,27 @@
+Training model with 25 epochs and learning rate 0.0025 --------------------
+Epoch 1/25	 Loss = 3227.2278
+Epoch 2/25	 Loss = 1939.8328
+Epoch 3/25	 Loss = 1549.8607
+Epoch 4/25	 Loss = 1329.2349
+Epoch 5/25	 Loss = 1118.7219
+Epoch 6/25	 Loss = 1025.7011
+Epoch 7/25	 Loss = 909.5918
+Epoch 8/25	 Loss = 830.0440
+Epoch 9/25	 Loss = 768.5837
+Epoch 10/25	 Loss = 742.8222
+Epoch 11/25	 Loss = 678.4787
+Epoch 12/25	 Loss = 673.6616
+Epoch 13/25	 Loss = 627.4248
+Epoch 14/25	 Loss = 629.8159
+Epoch 15/25	 Loss = 606.7152
+Epoch 16/25	 Loss = 586.5428
+Epoch 17/25	 Loss = 583.1395
+Epoch 18/25	 Loss = 569.7573
+Epoch 19/25	 Loss = 551.9458
+Epoch 20/25	 Loss = 540.4044
+Epoch 21/25	 Loss = 537.5428
+Epoch 22/25	 Loss = 524.9359
+Epoch 23/25	 Loss = 545.1044
+Epoch 24/25	 Loss = 518.1695
+Epoch 25/25	 Loss = 523.8695
+Time taken: 12846.517532587051 seconds

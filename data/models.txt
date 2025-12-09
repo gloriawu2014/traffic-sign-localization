@@ -1,5 +1,9 @@
-size32_epoch10: full model, resized to 32 pixels, 10 epochs, optimizer = Adam
-size32_epoch20: full model, resized to 32 pixels, 20 epochs, optimizer = Adam
-size512_epoch10: full model, resized to 512 pixels, 10 epochs, optimizer = Adam
-size512_epoch10_weights: weights only, resized to 512 pixels, 10 epochs, optimizer = Adam
-size512_epoch25_weights: weights only, resized to 512 pixels using default resize in transfomrs(), 25 epochs, optimizer = SGD
+Final model used for testing and evaluating with perturbations:
+final_model: weights only, resized to 512 pixels, 25 epochs, optimizer = SGD, lr = 0.0025
+
+Other models trained:
+size32_epoch10: full model, resized to 32 pixels, 10 epochs, optimizer = Adam, lr = 0.001
+size32_epoch20: full model, resized to 32 pixels, 20 epochs, optimizer = Adam, lr = 0.001
+size512_epoch10: full model, resized to 512 pixels, 10 epochs, optimizer = Adam, lr = 0.001
+size512_epoch10_weights: weights only, resized to 512 pixels, 10 epochs, optimizer = Adam, lr = 0.001
+size512_epoch25_weights: weights only, resized to 512 pixels using default resize in transfomrs(), 25 epochs, optimizer = SGD, lr = 0.0025

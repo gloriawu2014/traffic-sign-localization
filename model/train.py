@@ -74,6 +74,21 @@ def train(
 
         print(f"Epoch {epoch + 1}/{num_epochs}\t Loss = {total_loss:.4f}")
 
+        """
+        # quick sanity check
+        model.eval()
+        with torch.no_grad():
+            for i, (test_images, test_targets) in enumerate(trainloader):
+                if i >= 5:
+                    break
+                test_images = [img.to(device) for img in test_images]
+                pred = model(test_images)[0]
+                print("Predicted boxes:", pred["boxes"])
+                print("Predicted labels:", pred["labels"])
+                print("Predicted scores:", pred["scores"])
+        model.train()
+        """
+
 
 if __name__ == "__main__":
     start = time.time()
@@ -101,9 +116,7 @@ if __name__ == "__main__":
 
     train(model, trainloader, args.epochs, args.lr, args.momentum, args.weight_decay)
 
-    torch.save(
-        model.state_dict(), "../data/mask_rcnn_traffic_sign_size512_epoch25_weights.pth"
-    )
+    torch.save(model.state_dict(), "../data/final_model.pth")
 
     end = time.time()
     elapsed = end - start
