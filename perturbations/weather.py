@@ -6,6 +6,7 @@ All weather perturbations generated using the imagecorruptions package: https://
 import torch
 import torchvision
 from torchvision.ops import box_iou
+import torchvision.transforms as transforms
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 import argparse
 import time
@@ -15,6 +16,12 @@ if not hasattr(np, "float_"):
     np.float_ = (
         np.float64
     )  # need NumPy < 2.0, but don't want to change package/venv files
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message="pkg_resources is deprecated as an API.*"
+)
 from imagecorruptions import corrupt
 
 
@@ -55,6 +62,9 @@ def create_mask_rcnn(num_classes: int):
 def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
     num_clean = 0
     num_correct = 0
+    mean = np.array([0.485, 0.456, 0.406])
+    std  = np.array([0.229, 0.224, 0.225])
+
     with torch.no_grad():
         for images, targets in testloader:
             if num_clean >= num_test:
@@ -78,17 +88,13 @@ def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
                 corrupted_images = []
                 for img in images:
                     # corrupt() expects NumPy array of uint8
-                    np_img = img.permute(1, 2, 0).cpu().numpy()
-                    np_img = (np_img * 255).astype(np.uint8)
-                    corrupted_np = corrupt(
-                        np_img, corruption_name=corruption, severity=severity
-                    )
-                    corrupted_tensor = (
-                        torch.tensor(corrupted_np / 255.0, dtype=torch.float32)
-                        .permute(2, 0, 1)
-                        .to(device)
-                    )
-                    corrupted_images.append(corrupted_tensor)
+                    img_np = img.permute(1, 2, 0).cpu().numpy()
+                img_np = img_np * std + mean
+                img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
+                corrupted_np = corrupt(img_np, corruption_name=corruption, severity=severity)
+                corrupted_tensor = torch.tensor(corrupted_np / 255.0, dtype=torch.float32).permute(2, 0, 1).to(device)
+                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(device)
+                corrupted_images.append(corrupted_tensor)
 
                 corrupted_outputs = model(corrupted_images)
 
@@ -105,9 +111,10 @@ def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
                 num_correct += (max_iou_per_gt_corrupt > iou).sum().item()
 
         accuracy = num_correct / num_clean if num_clean > 0 else 0.0
-        print(
+        """print(
             f"Number of correct predictions with IoU {iou}: {num_correct} / {num_clean} = {accuracy:.4f}"
-        )
+        )"""
+        return num_correct, num_clean, accuracy
 
 
 if __name__ == "__main__":
@@ -148,14 +155,15 @@ if __name__ == "__main__":
     model.to(device)
     model.eval()
 
-    print(
+    """print(
         f"Evaluating model performance against {args.corruption} perturbations with severity {args.severity}"
-    )
+    )"""
 
-    evaluate_corrupt(
+    correct, total, accuracy = evaluate_corrupt(
         model, testloader, args.iou, args.corruption, args.severity, args.num_test
     )
 
     end = time.time()
     elapsed = end - start
-    print(f"Time taken: {elapsed} seconds")
+    #print(f"Time taken: {elapsed} seconds")
+    print(f"{args.corruption},{args.severity},{correct},{total},{accuracy},{elapsed}")

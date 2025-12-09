@@ -5,22 +5,31 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=4:00:00
-#SBATCH --output=weather_5.out
+#SBATCH --output=weather.out
 #SBATCH --error=weather.err
 
-#sbatch weather.sb <corruption> <severity> <iou> <num_test>
-
-CORRUPTION=${1:-snow}
-# OPTIONS: snow, frost, fog
-
-SEVERITY=${2:-1}
-# OPTIONS: 1-5
-
-IOU=${3:-0.5}
-
-NUM_TEST=${4:-100}
+#sbatch weather.sb
+# this script runs weather.py with each type of corruption and severity 5 times
 
 cd ../
 source .venv/bin/activate
 cd perturbations
-python3 weather.py --corruption $CORRUPTION --severity $SEVERITY --iou $IOU --num_test $NUM_TEST
+
+LOGFILE=weather.out
+IOU=${1:-0.5}
+NUM_TEST=${2:-100}
+
+echo type,severity,correct,total,accuracy,time > $LOGFILE
+
+for CORRUPTION in snow fog frost; do
+    for SEVERITY in 1 2 3 4 5; do
+        for REP in {1..5}; do
+            python3 weather.py \
+                --corruption $CORRUPTION \
+                --severity $SEVERITY \
+                --iou $IOU \
+                --num_test $NUM_TEST \
+                >> $LOGFILE 2>&1
+        done
+    done
+done
