@@ -27,10 +27,6 @@ tar -xvjf JPEGImages.tar.bz2
 
 # Reproducing Results (HPC)
 
-Make sure you are in a virtual environment:
-```
-source .venv/bin/activate
-```
 **Train and test the model:**
 ```
 cd model
@@ -47,11 +43,8 @@ sbatch weather.sb <LIGHTING TYPE> <SEVERITY> <IOU> <NUM_TEST>
 
 # Development
 
-Make sure to commit any dependencies you add:
+Before committing, make sure to commit any added dependencies and format code with Ruff:
 ```
 pip freeze > requirements.txt
-```
-Format code with Ruff (from the root directory of the repository):
-```
 ruff format
 ```
