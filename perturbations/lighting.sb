@@ -10,11 +10,13 @@
 
 #sbatch lighting.sb <iou> <num_test>
 
-IOU=${1:-0.5}
+LIGHTING_TYPE=${1:-bright}
 
-NUM_TEST=${2:-100}
+SEVERITY=${2:-1.0}
 
-# ADD ANY OTHER COMMAND-LINE ARGUMENTS HERE
+IOU=${3:-0.5}
+
+NUM_TEST=${4:-100}
 
 cd ../
 source .venv/bin/activate

@@ -13,17 +13,35 @@ All lighting perturbations generated using the ColorJitter module from TorchVisi
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-#creates a transformer to make an image look more bright or dark or more like dawn or dusk
-#severity should range from 0 to 1.0, and is how severely bright/dark/dusky/etc. the transformation will be
+
+# creates a transformer to make an image look more bright or dark or more like dawn or dusk
+# severity should range from 0 to 1.0, and is how severely bright/dark/dusky/etc. the transformation will be
 def getTransformer(lighting_type, severity):
-    if lighting_type == "dark" : 
-        transform = transforms.ColorJitter(brightness = (0.1*severity, 0.1*severity), contrast = (0.1*severity, 0.1*severity), saturation = (0.7*severity, 0.7*severity))
-    elif lighting_type == "dawn" :
-        transform = transforms.ColorJitter(contrast = (1.1*severity, 1.1*severity), saturation = (1.2*severity, 1.2*severity), hue = (0.9*severity, 0.9*severity))
-    elif lighting_type == "dusk" :
-        transform = transforms.ColorJitter(brightness = (0.7*severity, 0.7*severity), contrast = (0.8*severity, 0.8*severity), saturation = (-0.1*severity, -0.1*severity), hue = (0.1*severity, 0.1*severity))
-    else: #"bright" or other
-        transform = transforms.ColorJitter(brightness = (2*severity, 2*severity), contrast = (0.5*severity, 0.5*severity), saturation = (0.8*severity, 0.9*severity))
+    if lighting_type == "dark":
+        transform = transforms.ColorJitter(
+            brightness=(0.1 * severity, 0.1 * severity),
+            contrast=(0.1 * severity, 0.1 * severity),
+            saturation=(0.7 * severity, 0.7 * severity),
+        )
+    elif lighting_type == "dawn":
+        transform = transforms.ColorJitter(
+            contrast=(1.1 * severity, 1.1 * severity),
+            saturation=(1.2 * severity, 1.2 * severity),
+            hue=(0.9 * severity, 0.9 * severity),
+        )
+    elif lighting_type == "dusk":
+        transform = transforms.ColorJitter(
+            brightness=(0.7 * severity, 0.7 * severity),
+            contrast=(0.8 * severity, 0.8 * severity),
+            saturation=(-0.1 * severity, -0.1 * severity),
+            hue=(0.1 * severity, 0.1 * severity),
+        )
+    else:  # "bright" or other
+        transform = transforms.ColorJitter(
+            brightness=(2 * severity, 2 * severity),
+            contrast=(0.5 * severity, 0.5 * severity),
+            saturation=(0.8 * severity, 0.9 * severity),
+        )
     return transform
 
 
@@ -110,7 +128,9 @@ def evaluate_corrupt(model, testloader, iou, transform, num_test):
                     num_correct += 1
                     continue
 
-        print(f"Number of correct predictions with IoU {iou}: {num_correct} / {num_clean} = {num_correct/num_clean:.4f}")
+        print(
+            f"Number of correct predictions with IoU {iou}: {num_correct} / {num_clean} = {num_correct / num_clean:.4f}"
+        )
 
 
 if __name__ == "__main__":
@@ -132,9 +152,14 @@ if __name__ == "__main__":
         description="Type of lighting perturbation: dawn, dusk, bright, dark",
     )
     parser.add_argument(
-        "--severity", type=int, default=1, description="Severity of corruption from 0.0 to 1.0"
+        "--severity",
+        type=int,
+        default=1,
+        description="Severity of corruption from 0.0 to 1.0",
     )
-    parser.add_argument("--num_test", type=int, default=20, description="Number of images to corrupt")
+    parser.add_argument(
+        "--num_test", type=int, default=20, description="Number of images to corrupt"
+    )
     args = parser.parse_args()
 
     _, testloader = parse_DFG()
@@ -149,9 +174,14 @@ if __name__ == "__main__":
     model.to(device)
     model.eval()
 
-    evaluate_corrupt(model, testloader, args.iou, getTransformer(args.lighting_type, args.severity), args.num_test)
+    evaluate_corrupt(
+        model,
+        testloader,
+        args.iou,
+        getTransformer(args.lighting_type, args.severity),
+        args.num_test,
+    )
 
     end = time.time()
     elapsed = end - start
     print(f"Time taken: {elapsed} seconds")
-
