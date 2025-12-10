@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --job-name=tyolo
+#SBATCH --partition=gpu-a5000-q
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --time=10:00:00
+#SBATCH --output=tyolo.out
+#SBATCH --error=tyolo.err
+
+#sbatch tyolo.sb
+
+
+cd ../
+cd newultralytics
+python tyolo.py

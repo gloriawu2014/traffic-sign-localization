@@ -1,0 +1,15 @@
+Current version: v1.02
+
+
+Changes since v1.01:
+ - fixed y coordinate in segmentation/mask annotations
+ - added non-tight segmentation/mask for augmentation data (just converted bounding box to polygon)
+
+Changes since v1.0:
+ - fixed annotation in file 0004024.xml (changed III-84 to III-85.1)
+
+Changes since v0.9:
+ - updated all annotations for instances of above 30 px to tight polygon (segmentation mask)
+   - fixed mostly circular and triangular signs
+ - rechecked for smaller annotations (below 30 px) that are marked as 'ignore'
+   - added over 1500 annotations of smaller instances 
