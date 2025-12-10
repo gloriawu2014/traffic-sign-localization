@@ -29,7 +29,7 @@ tar -xvjf JPEGImages.tar.bz2
 
 # Layout Overview
 
-**Instructions on reproducing results are included in README.mds in the following folders**
+**Instructions on reproducing results are included in separate README.mds in the following folders**
 
 ```
 ├── data/                       # All data and trained models
