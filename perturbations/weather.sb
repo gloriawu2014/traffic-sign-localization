@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=4:00:00
-#SBATCH --output=weather_2.out
+#SBATCH --output=weather.out
 #SBATCH --error=weather.err
 
 #sbatch weather.sb
@@ -15,7 +15,7 @@ cd ../
 source .venv/bin/activate
 cd perturbations
 
-LOGFILE=weather_2.out
+LOGFILE=weather.out
 IOU=${1:-0.5}
 NUM_TEST=${2:-100}
 
