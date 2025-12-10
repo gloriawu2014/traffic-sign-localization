@@ -31,7 +31,6 @@ tar -xvjf JPEGImages.tar.bz2
 
 ```
 ├── data/                       # All data and trained models
-├── deliverables/               # Project deliverables
 ├── model/                      # Training and evaluation of model on DFG dataset
 ├── newultralytics/             # Testing on YOLO model
 ├── perturbations/              # Evaluation of safety specifications on trained model

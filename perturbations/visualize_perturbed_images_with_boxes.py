@@ -215,10 +215,9 @@ if __name__ == "__main__":
         weather = True
     else:
         weather = False
-    if weather and not isinstance(args.severity, int):
-        print(f"Please provide an integer argument between 1 and 5 for severity")
-        exit
-    elif not weather and args.severity > 1:
+    if weather:
+        args.severity = int(args.severity)
+    if not weather and args.severity > 1:
         print(f"Please provide a severity between 0 and 1")
         exit
 
