@@ -34,7 +34,7 @@ for ctype in corruption_types:
     plt.xlabel("Severity")
     plt.ylabel("Accuracy")
     plt.title(f"Accuracy vs Severity for: {ctype.capitalize()}")
-    if (args.file == "weather.out"):
+    if args.file == "weather.out":
         plt.xticks([1, 2, 3, 4, 5])
     else:
         plt.xticks([0.25, 0.50, 0.75, 1.0])

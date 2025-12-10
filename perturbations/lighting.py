@@ -23,7 +23,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # creates a transformer to make an image look more bright or dark or more like dawn or dusk
-# severity should range from 0 to 1.0, and is how severely bright/dusky/etc. 
+# severity should range from 0 to 1.0, and is how severely bright/dusky/etc.
 def getTransformer(lighting_type, severity):
     if lighting_type == "dawn":
         transform = transforms.ColorJitter(
@@ -35,7 +35,7 @@ def getTransformer(lighting_type, severity):
         transform = transforms.ColorJitter(
             brightness=(0.7 * severity, 0.7 * severity),
             contrast=(0.8, 0.8),
-            saturation=(0.5*severity, 0.5*severity),
+            saturation=(0.5 * severity, 0.5 * severity),
             hue=(0.1 * severity, 0.1 * severity),
         )
     else:  # "bright" or other
@@ -103,8 +103,10 @@ def evaluate_corrupt(model, testloader, iou, transform, num_test):
                 pil = transforms.ToPILImage()(img_np)
                 jittered = transform(pil)
                 corrupted_tensor = transforms.ToTensor()(jittered)
-                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(device)
-                    
+                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(
+                    device
+                )
+
                 corrupted_output = model([corrupted_tensor])[0]
                 corrupt_boxes = corrupted_output["boxes"].cpu()
 
@@ -148,10 +150,7 @@ if __name__ == "__main__":
         help="Severity of corruption from 0.0 to 1.0",
     )
     parser.add_argument(
-        "--num_test", 
-        type=int, 
-        default=20, 
-        help="Number of images to corrupt"
+        "--num_test", type=int, default=20, help="Number of images to corrupt"
     )
     args = parser.parse_args()
 
@@ -178,4 +177,6 @@ if __name__ == "__main__":
     end = time.time()
     elapsed = end - start
     # print(f"Time taken: {elapsed} seconds")
-    print(f"{args.lighting_type},{args.severity},{correct},{total},{accuracy},{elapsed}")
+    print(
+        f"{args.lighting_type},{args.severity},{correct},{total},{accuracy},{elapsed}"
+    )

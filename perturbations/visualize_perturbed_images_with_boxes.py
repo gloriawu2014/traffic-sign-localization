@@ -30,6 +30,7 @@ from model.parse_coco import parse_DFG, count_classes
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 def getTransformer(lighting_type, severity):
     if lighting_type == "dawn":
         transform = transforms.ColorJitter(
@@ -41,7 +42,7 @@ def getTransformer(lighting_type, severity):
         transform = transforms.ColorJitter(
             brightness=(0.7 * severity, 0.7 * severity),
             contrast=(0.8, 0.8),
-            saturation=(0.5*severity, 0.5*severity),
+            saturation=(0.5 * severity, 0.5 * severity),
             hue=(0.1 * severity, 0.1 * severity),
         )
     else:  # "bright" or other
@@ -49,6 +50,7 @@ def getTransformer(lighting_type, severity):
             brightness=(2 * severity, 2 * severity),
         )
     return transform
+
 
 def create_mask_rcnn(num_classes: int):
     """
@@ -83,7 +85,7 @@ def visualize_corruption(
     iou: float,
     num_images: int,
     output_dir: str,
-    weather: bool
+    weather: bool,
 ):
     os.makedirs(output_dir, exist_ok=True)
     mean = np.array([0.485, 0.456, 0.406])
@@ -105,7 +107,7 @@ def visualize_corruption(
             img_np = img_np * std + mean
             img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
 
-            if weather: 
+            if weather:
                 corrupted_np = corrupt(
                     img_np, corruption_name=corruption, severity=severity
                 )
@@ -189,10 +191,7 @@ if __name__ == "__main__":
         help="Type of weather perturbation: snow, frost, fog or lighting: dark, dawn, dusk, bright",
     )
     parser.add_argument(
-        "--severity", 
-        type=float, 
-        default=1, 
-        help="Severity of corruption"
+        "--severity", type=float, default=1, help="Severity of corruption"
     )
     parser.add_argument(
         "--num_images",
@@ -208,7 +207,11 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    if (args.corruption == "snow" or args.corruption == "frost" or args.corruption == "fog"):
+    if (
+        args.corruption == "snow"
+        or args.corruption == "frost"
+        or args.corruption == "fog"
+    ):
         weather = True
     else:
         weather = False
@@ -239,5 +242,5 @@ if __name__ == "__main__":
         args.iou,
         args.num_images,
         args.output_dir,
-        weather
+        weather,
     )

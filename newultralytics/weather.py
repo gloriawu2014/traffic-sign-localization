@@ -13,14 +13,10 @@ import time
 import numpy as np
 
 if not hasattr(np, "float_"):
-    np.float_ = (
-        np.float64
-    )  # need NumPy < 2.0, but don't want to change package/venv files
+    np.float_ = np.float64  # need NumPy < 2.0, but don't want to change package/venv files
 import warnings
 
-warnings.filterwarnings(
-    "ignore", category=UserWarning, message="pkg_resources is deprecated as an API.*"
-)
+warnings.filterwarnings("ignore", category=UserWarning, message="pkg_resources is deprecated as an API.*")
 from imagecorruptions import corrupt
 
 
@@ -42,18 +38,12 @@ def create_mask_rcnn(num_classes: int):
     model = torchvision.models.detection.maskrcnn_resnet50_fpn(weights="DEFAULT")
 
     in_features = model.roi_heads.box_predictor.cls_score.in_features
-    model.roi_heads.box_predictor = (
-        torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
-            in_features, num_classes
-        )
-    )
+    model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCNNPredictor(in_features, num_classes)
 
     # input channels to mask predictor -> intermediate layer in mask head -> new mask prediction head
     in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
     hidden_layer = 256  # intermediate layer
-    model.roi_heads.mask_predictor = MaskRCNNPredictor(
-        in_features_mask, hidden_layer, num_classes
-    )
+    model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask, hidden_layer, num_classes)
 
     return model
 
@@ -90,17 +80,9 @@ def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
                     img_np = img.permute(1, 2, 0).cpu().numpy()
                 img_np = img_np * std + mean
                 img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
-                corrupted_np = corrupt(
-                    img_np, corruption_name=corruption, severity=severity
-                )
-                corrupted_tensor = (
-                    torch.tensor(corrupted_np / 255.0, dtype=torch.float32)
-                    .permute(2, 0, 1)
-                    .to(device)
-                )
-                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(
-                    device
-                )
+                corrupted_np = corrupt(img_np, corruption_name=corruption, severity=severity)
+                corrupted_tensor = torch.tensor(corrupted_np / 255.0, dtype=torch.float32).permute(2, 0, 1).to(device)
+                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(device)
                 corrupted_images.append(corrupted_tensor)
 
                 corrupted_outputs = model(corrupted_images)
@@ -127,9 +109,7 @@ def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
 if __name__ == "__main__":
     start = time.time()
 
-    parser = argparse.ArgumentParser(
-        description="Test model against adversarial weather perturbations"
-    )
+    parser = argparse.ArgumentParser(description="Test model against adversarial weather perturbations")
     parser.add_argument(
         "--iou",
         type=float,
@@ -142,18 +122,8 @@ if __name__ == "__main__":
         default="snow",
         help="Type of weather perturbation: snow, frost, fog",
     )
-    parser.add_argument(
-        "--severity", 
-        type=int, 
-        default=1, 
-        help="Severity of corruption"
-    )
-    parser.add_argument(
-        "--num_test", 
-        type=int, 
-        default=100, 
-        help="Number of images to corrupt"
-    )
+    parser.add_argument("--severity", type=int, default=1, help="Severity of corruption")
+    parser.add_argument("--num_test", type=int, default=100, help="Number of images to corrupt")
     args = parser.parse_args()
 
     _, testloader = parse_DFG()

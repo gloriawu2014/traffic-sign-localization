@@ -30,17 +30,9 @@ def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
                     img_np = img.permute(1, 2, 0).cpu().numpy()
                 img_np = img_np * std + mean
                 img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
-                corrupted_np = corrupt(
-                    img_np, corruption_name=corruption, severity=severity
-                )
-                corrupted_tensor = (
-                    torch.tensor(corrupted_np / 255.0, dtype=torch.float32)
-                    .permute(2, 0, 1)
-                    .to(device)
-                )
-                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(
-                    device
-                )
+                corrupted_np = corrupt(img_np, corruption_name=corruption, severity=severity)
+                corrupted_tensor = torch.tensor(corrupted_np / 255.0, dtype=torch.float32).permute(2, 0, 1).to(device)
+                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(device)
                 corrupted_images.append(corrupted_tensor)
 
                 corrupted_outputs = model(corrupted_images)
@@ -67,9 +59,7 @@ def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
 if __name__ == "__main__":
     start = time.time()
 
-    parser = argparse.ArgumentParser(
-        description="Test model against adversarial weather perturbations"
-    )
+    parser = argparse.ArgumentParser(description="Test model against adversarial weather perturbations")
     parser.add_argument(
         "--iou",
         type=float,
@@ -82,18 +72,8 @@ if __name__ == "__main__":
         default="snow",
         help="Type of weather perturbation: snow, frost, fog",
     )
-    parser.add_argument(
-        "--severity",
-        type=int,
-        default=1,
-        help="Severity of corruption"
-    )
-    parser.add_argument(
-        "--num_test",
-        type=int,
-        default=100,
-        help="Number of images to corrupt"
-    )
+    parser.add_argument("--severity", type=int, default=1, help="Severity of corruption")
+    parser.add_argument("--num_test", type=int, default=100, help="Number of images to corrupt")
     args = parser.parse_args()
 
     _, testloader = parse_DFG()

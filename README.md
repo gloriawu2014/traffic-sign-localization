@@ -1,10 +1,8 @@
-# traffic-sign-localization
+# Traffic Sign Localization
 
-COSC 227 Final Project: Implementing, evaluating, and improving a localization model for detecting traffic signs.
+This project aims to train and evaluate a model for detecting the bounding box of a traffic sign. Additionally, we compare the model to a state-of-the-art model, YOLOv11. This project uses the DFG dataset for training and testing: https://www.vicos.si/resources/dfg/
 
-This project uses the DFG dataset for training and testing: https://www.vicos.si/resources/dfg/
-
-Chloe Lee, Isabella Niemi, Marah Sami, Gloria Wu
+COSC 227 Final Project: Chloe Lee, Isabella Niemi, Marah Sami, Gloria Wu
 
 # Setup (HPC)
 

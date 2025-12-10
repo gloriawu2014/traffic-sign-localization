@@ -98,9 +98,9 @@ def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
                         .permute(2, 0, 1)
                         .to(device)
                     )
-                    corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(
-                        device
-                    )
+                    corrupted_tensor = transforms.Normalize(mean, std)(
+                        corrupted_tensor
+                    ).to(device)
                     corrupted_images.append(corrupted_tensor)
 
                 corrupted_outputs = model(corrupted_images)
@@ -143,16 +143,10 @@ if __name__ == "__main__":
         help="Type of weather perturbation: snow, frost, fog",
     )
     parser.add_argument(
-        "--severity", 
-        type=int, 
-        default=1, 
-        help="Severity of corruption"
+        "--severity", type=int, default=1, help="Severity of corruption"
     )
     parser.add_argument(
-        "--num_test", 
-        type=int, 
-        default=100, 
-        help="Number of images to corrupt"
+        "--num_test", type=int, default=100, help="Number of images to corrupt"
     )
     args = parser.parse_args()
 
