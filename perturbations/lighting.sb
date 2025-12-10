@@ -8,17 +8,28 @@
 #SBATCH --output=lighting.out
 #SBATCH --error=lighting.err
 
-#sbatch lighting.sb <iou> <num_test>
-
-LIGHTING_TYPE=${1:-bright}
-
-SEVERITY=${2:-1.0}
-
-IOU=${3:-0.5}
-
-NUM_TEST=${4:-100}
+#sbatch lighting.sb
+# this script runs lighting.py with each type of lighting and severity (0.25, 0.5, 1) 5 times
 
 cd ../
 source .venv/bin/activate
 cd perturbations
-python3 lighting.py --lighting_type $LIGHTING_TYPE --severity $SEVERITY --iou $IOU --num_test $NUM_TEST
+
+LOGFILE=weather.out
+IOU=${1:-0.5}
+NUM_TEST=${2:-100}
+
+echo type,severity,correct,total,accuracy,time > $LOGFILE
+
+for CORRUPTION in dark dawn dusk bright; do
+    for SEVERITY in 0.25 0.50 0.75 1.0; do 
+        for REP in {1..5}; do
+            python3 lighting.py \
+                --lighting_type $CORRUPTION \
+                --severity $SEVERITY \
+                --iou $IOU \
+                --num_test $NUM_TEST \
+                >> $LOGFILE 2>&1
+        done
+    done
+done

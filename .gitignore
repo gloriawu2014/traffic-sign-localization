@@ -219,3 +219,5 @@ newultralytics/dataset/images/train
 *.zip
 *.tar.bz2
 ultralytics/dataset/images/train
+yolo/dataset/images
+yolo/dfg_annotations/JPEGImages

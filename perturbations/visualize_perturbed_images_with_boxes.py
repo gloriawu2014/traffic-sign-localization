@@ -1,5 +1,5 @@
 """
-Script to show images with the weather perturbation, as well as the ground truth and predicted boxes.
+Script to show images with the weather or lighting perturbation, as well as the ground truth and predicted boxes.
 """
 
 import torch
@@ -30,6 +30,33 @@ from model.parse_coco import parse_DFG, count_classes
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+def getTransformer(lighting_type, severity):
+    if lighting_type == "dark":
+        transform = transforms.ColorJitter(
+            brightness=(0.1 * severity, 0.1 * severity),
+            contrast=(0.1 * severity, 0.1 * severity),
+            saturation=(0.7 * severity, 0.7 * severity),
+        )
+    elif lighting_type == "dawn":
+        transform = transforms.ColorJitter(
+            contrast=(1.1 * severity, 1.1 * severity),
+            saturation=(1.2 * severity, 1.2 * severity),
+            hue=(0.9 * severity, 0.9 * severity),
+        )
+    elif lighting_type == "dusk":
+        transform = transforms.ColorJitter(
+            brightness=(0.7 * severity, 0.7 * severity),
+            contrast=(0.8 * severity, 0.8 * severity),
+            saturation=(-0.1 * severity, -0.1 * severity),
+            hue=(0.1 * severity, 0.1 * severity),
+        )
+    else:  # "bright" or other
+        transform = transforms.ColorJitter(
+            brightness=(2 * severity, 2 * severity),
+            contrast=(0.5 * severity, 0.5 * severity),
+            saturation=(0.8 * severity, 0.9 * severity),
+        )
+    return transform
 
 def create_mask_rcnn(num_classes: int):
     """
@@ -64,10 +91,15 @@ def visualize_corruption(
     iou: float,
     num_images: int,
     output_dir: str,
+    weather: bool
 ):
     os.makedirs(output_dir, exist_ok=True)
     mean = np.array([0.485, 0.456, 0.406])
     std = np.array([0.229, 0.224, 0.225])
+
+    lighting_transform = none
+    if not weather:
+        lighting_transform = getTransformer(corruption, severity)
 
     with torch.no_grad():
         for i, (images, targets) in enumerate(dataloader):
@@ -135,7 +167,7 @@ def visualize_corruption(
             )
             ax.axis("off")
             save_path = os.path.join(
-                output_dir, f"Image_{corruption}_{severity}_{i + 1}.jpg"
+                output_dir, f"image_{corruption}_{severity}_{i + 1}.jpg"
             )
             plt.savefig(save_path, format="jpg", dpi=300)
             plt.close()
@@ -155,10 +187,13 @@ if __name__ == "__main__":
         "--corruption",
         type=str,
         default="snow",
-        help="Type of weather perturbation: snow, frost, fog",
+        help="Type of weather perturbation: snow, frost, fog or lighting: dark, dawn, dusk, bright",
     )
     parser.add_argument(
-        "--severity", type=int, default=1, help="Severity of corruption"
+        "--severity", 
+        type=float, 
+        default=1, 
+        help="Severity of corruption"
     )
     parser.add_argument(
         "--num_images",
@@ -173,6 +208,17 @@ if __name__ == "__main__":
         help="Output directory for images",
     )
     args = parser.parse_args()
+
+    if (args.corruption == "snow" or args.corruption == "frost" or args.corruption == "fog"):
+        weather = True
+    else:
+        weather = False
+    if weather and not isinstance(args.severity, int):
+        print(f"Please provide an integer argument between 1 and 5 for severity")
+        exit
+    elif not weather and args.severity > 1:
+        print(f"Please provide a severity between 0 and 1")
+        exit
 
     _, testloader = parse_DFG()
 
@@ -194,4 +240,5 @@ if __name__ == "__main__":
         args.iou,
         args.num_images,
         args.output_dir,
+        weather
     )

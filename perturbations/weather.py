@@ -143,10 +143,16 @@ if __name__ == "__main__":
         help="Type of weather perturbation: snow, frost, fog",
     )
     parser.add_argument(
-        "--severity", type=int, default=1, help="Severity of corruption"
+        "--severity", 
+        type=int, 
+        default=1, 
+        help="Severity of corruption"
     )
     parser.add_argument(
-        "--num_test", type=int, default=100, help="Number of images to corrupt"
+        "--num_test", 
+        type=int, 
+        default=100, 
+        help="Number of images to corrupt"
     )
     args = parser.parse_args()
 

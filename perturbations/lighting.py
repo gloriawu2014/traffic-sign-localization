@@ -85,12 +85,7 @@ def evaluate_corrupt(model, testloader, iou, transform, num_test):
             pred_boxes = output["boxes"].cpu()
             true_boxes = target["boxes"]
 
-            # edge case: no predicted boxes
-            if len(pred_boxes) == 0:
-                continue
-
-            # edge case: no ground truth boxes
-            if len(true_boxes) == 0:
+            if len(pred_boxes) == 0 or len(true_boxes) == 0:
                 continue
 
             # compute IoU
@@ -128,9 +123,11 @@ def evaluate_corrupt(model, testloader, iou, transform, num_test):
                     num_correct += 1
                     continue
 
-        print(
-            f"Number of correct predictions with IoU {iou}: {num_correct} / {num_clean} = {num_correct / num_clean:.4f}"
-        )
+        accuracy = num_correct / num_clean if num_clean > 0 else 0.0
+        """print(
+            f"Number of correct predictions with IoU {iou}: {num_correct} / {num_clean} = {accuracy:.4f}"
+        )"""
+        return num_correct, num_clean, accuracy
 
 
 if __name__ == "__main__":
@@ -149,16 +146,19 @@ if __name__ == "__main__":
         "--lighting_type",
         type=str,
         default="bright",
-        description="Type of lighting perturbation: dawn, dusk, bright, dark",
+        help="Type of lighting perturbation: dawn, dusk, bright, dark",
     )
     parser.add_argument(
         "--severity",
         type=int,
         default=1,
-        description="Severity of corruption from 0.0 to 1.0",
+        help="Severity of corruption from 0.0 to 1.0",
     )
     parser.add_argument(
-        "--num_test", type=int, default=20, description="Number of images to corrupt"
+        "--num_test", 
+        type=int, 
+        default=20, 
+        help="Number of images to corrupt"
     )
     args = parser.parse_args()
 
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     model.to(device)
     model.eval()
 
-    evaluate_corrupt(
+    correct, total, accuracy = evaluate_corrupt(
         model,
         testloader,
         args.iou,
@@ -184,4 +184,5 @@ if __name__ == "__main__":
 
     end = time.time()
     elapsed = end - start
-    print(f"Time taken: {elapsed} seconds")
+    # print(f"Time taken: {elapsed} seconds")
+    print(f"{args.lighting_type},{args.severity},{correct},{total},{accuracy},{elapsed}")
