@@ -88,20 +88,20 @@ def evaluate_corrupt(model, testloader, iou, corruption, severity, num_test):
                 for img in images:
                     # corrupt() expects NumPy array of uint8
                     img_np = img.permute(1, 2, 0).cpu().numpy()
-                img_np = img_np * std + mean
-                img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
-                corrupted_np = corrupt(
-                    img_np, corruption_name=corruption, severity=severity
-                )
-                corrupted_tensor = (
-                    torch.tensor(corrupted_np / 255.0, dtype=torch.float32)
-                    .permute(2, 0, 1)
-                    .to(device)
-                )
-                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(
-                    device
-                )
-                corrupted_images.append(corrupted_tensor)
+                    img_np = img_np * std + mean
+                    img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
+                    corrupted_np = corrupt(
+                        img_np, corruption_name=corruption, severity=severity
+                    )
+                    corrupted_tensor = (
+                        torch.tensor(corrupted_np / 255.0, dtype=torch.float32)
+                        .permute(2, 0, 1)
+                        .to(device)
+                    )
+                    corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(
+                        device
+                    )
+                    corrupted_images.append(corrupted_tensor)
 
                 corrupted_outputs = model(corrupted_images)
 

@@ -15,13 +15,13 @@ cd ../
 source .venv/bin/activate
 cd perturbations
 
-LOGFILE=weather.out
+LOGFILE=lighting.out
 IOU=${1:-0.5}
 NUM_TEST=${2:-100}
 
 echo type,severity,correct,total,accuracy,time > $LOGFILE
 
-for CORRUPTION in dark dawn dusk bright; do
+for CORRUPTION in dawn dusk bright; do
     for SEVERITY in 0.25 0.50 0.75 1.0; do 
         for REP in {1..5}; do
             python3 lighting.py \

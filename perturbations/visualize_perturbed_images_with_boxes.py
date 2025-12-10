@@ -31,30 +31,22 @@ from model.parse_coco import parse_DFG, count_classes
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def getTransformer(lighting_type, severity):
-    if lighting_type == "dark":
-        transform = transforms.ColorJitter(
-            brightness=(0.1 * severity, 0.1 * severity),
-            contrast=(0.1 * severity, 0.1 * severity),
-            saturation=(0.7 * severity, 0.7 * severity),
-        )
-    elif lighting_type == "dawn":
+    if lighting_type == "dawn":
         transform = transforms.ColorJitter(
             contrast=(1.1 * severity, 1.1 * severity),
             saturation=(1.2 * severity, 1.2 * severity),
-            hue=(0.9 * severity, 0.9 * severity),
+            hue=(-0.1 * severity, -0.1 * severity),
         )
     elif lighting_type == "dusk":
         transform = transforms.ColorJitter(
             brightness=(0.7 * severity, 0.7 * severity),
-            contrast=(0.8 * severity, 0.8 * severity),
-            saturation=(-0.1 * severity, -0.1 * severity),
+            contrast=(0.8, 0.8),
+            saturation=(0.5*severity, 0.5*severity),
             hue=(0.1 * severity, 0.1 * severity),
         )
     else:  # "bright" or other
         transform = transforms.ColorJitter(
             brightness=(2 * severity, 2 * severity),
-            contrast=(0.5 * severity, 0.5 * severity),
-            saturation=(0.8 * severity, 0.9 * severity),
         )
     return transform
 
@@ -97,7 +89,7 @@ def visualize_corruption(
     mean = np.array([0.485, 0.456, 0.406])
     std = np.array([0.229, 0.224, 0.225])
 
-    lighting_transform = none
+    lighting_transform = None
     if not weather:
         lighting_transform = getTransformer(corruption, severity)
 
@@ -112,17 +104,24 @@ def visualize_corruption(
             img_np = img.permute(1, 2, 0).cpu().numpy()
             img_np = img_np * std + mean
             img_np = (img_np * 255).clip(0, 255).astype(np.uint8)
-            corrupted_np = corrupt(
-                img_np, corruption_name=corruption, severity=severity
-            )
-            corrupted_tensor = (
-                torch.tensor(corrupted_np / 255.0, dtype=torch.float32)
-                .permute(2, 0, 1)
-                .to(device)
-            )
-            corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor).to(
-                device
-            )
+
+            if weather: 
+                corrupted_np = corrupt(
+                    img_np, corruption_name=corruption, severity=severity
+                )
+                corrupted_tensor = (
+                    torch.tensor(corrupted_np / 255.0, dtype=torch.float32)
+                    .permute(2, 0, 1)
+                    .to(device)
+                )
+                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor)
+            else:
+                unnorm = img_np / 255.0
+                jittered = lighting_transform(transforms.ToPILImage()(unnorm))
+                corrupted_tensor = transforms.ToTensor()(jittered)
+                corrupted_tensor = transforms.Normalize(mean, std)(corrupted_tensor)
+
+            corrupted_tensor = corrupted_tensor.to(device)
 
             outputs = model([corrupted_tensor])[0]
 
