@@ -1,6 +1,6 @@
 path: /home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/dataset
 train: images/train
-val: images/val
+val: images/test
 nc: 200
 names:
   0: I-1
