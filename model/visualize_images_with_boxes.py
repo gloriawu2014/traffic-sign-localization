@@ -92,7 +92,7 @@ def visualize(model, dataloader, num_images: int, iou: float, output_dir: str):
 
             ax.set_title(f"Yellow: ground truth | Red: predicted")
             ax.axis("off")
-            save_path = os.path.join(output_dir, f"Image{i + 1}.jpg")
+            save_path = os.path.join(output_dir, f"image{i + 1}.jpg")
             plt.savefig(save_path, format="jpg", dpi=300)
             plt.close()
 
@@ -136,7 +136,5 @@ if __name__ == "__main__":
         testloader,
         args.num_images,
         args.iou,
-        args.gt,
-        args.pred,
         args.output_dir,
     )
