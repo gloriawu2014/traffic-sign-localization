@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --job-name=t25
+#SBATCH --partition=gpu-a5000-q
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --time=10:00:00
+#SBATCH --output=t25.out
+#SBATCH --error=t25.err
+
+#sbatch t25.sb
+
+
+cd ../
+cd newultralytics
+python t25.py

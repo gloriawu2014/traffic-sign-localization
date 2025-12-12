@@ -5,3 +5,5 @@ model = YOLO("yolo11n.yaml")  # build a new model from YAML
 
 # Train the model
 model.train(data="dfg.yaml", epochs=100, imgsz=512)
+
+print("Training saved to:", results.save_dir)
