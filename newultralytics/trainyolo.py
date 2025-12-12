@@ -4,4 +4,4 @@ from ultralytics import YOLO
 model = YOLO("yolo11n.yaml")  # build a new model from YAML
 
 # Train the model
-results = model.train(data="dfg.yaml", epochs=100, imgsz=512)
+model.train(data="dfg.yaml", epochs=100, imgsz=512)

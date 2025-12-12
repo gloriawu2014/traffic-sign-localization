@@ -1,6 +1,36 @@
 /home/chhlee28/.local/lib/python3.9/site-packages/torch/utils/data/dataloader.py:627: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 4, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
   warnings.warn(
-/home/chhlee28/.local/lib/python3.9/site-packages/torch/utils/data/dataloader.py:627: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 4, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
-  warnings.warn(
-/home/chhlee28/.local/lib/python3.9/site-packages/torch/utils/data/dataloader.py:627: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 4, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
-  warnings.warn(
+Traceback (most recent call last):
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/ultralytics/data/base.py", line 177, in get_img_files
+    assert im_files, f"{self.prefix}No images found in {img_path}. {FORMATS_HELP_MSG}"
+AssertionError: [34m[1mval: [0mNo images found in /home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/dataset/images/test. Supported formats are:
+images: {'tif', 'dng', 'jpeg', 'jpg', 'mpo', 'tiff', 'png', 'webp', 'heic', 'bmp', 'pfm'}
+videos: {'mpeg', 'webm', 'asf', 'mkv', 'm4v', 'mpg', 'avi', 'mov', 'mp4', 'ts', 'gif', 'wmv'}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/tyolo.py", line 5, in <module>
+    results = model.train(data="dfg.yaml", epochs=50, imgsz=512)
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/ultralytics/engine/model.py", line 773, in train
+    self.trainer.train()
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/ultralytics/engine/trainer.py", line 243, in train
+    self._do_train()
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/ultralytics/engine/trainer.py", line 364, in _do_train
+    self._setup_train()
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/ultralytics/engine/trainer.py", line 327, in _setup_train
+    self.test_loader = self.get_dataloader(
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/ultralytics/models/yolo/detect/train.py", line 93, in get_dataloader
+    dataset = self.build_dataset(dataset_path, mode, batch_size)
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/ultralytics/models/yolo/detect/train.py", line 77, in build_dataset
+    return build_yolo_dataset(self.args, img_path, batch, self.data, mode=mode, rect=mode == "val", stride=gs)
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/ultralytics/data/build.py", line 236, in build_yolo_dataset
+    return dataset(
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/ultralytics/data/dataset.py", line 88, in __init__
+    super().__init__(*args, channels=self.data.get("channels", 3), **kwargs)
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/ultralytics/data/base.py", line 115, in __init__
+    self.im_files = self.get_img_files(self.img_path)
+  File "/home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/ultralytics/data/base.py", line 179, in get_img_files
+    raise FileNotFoundError(f"{self.prefix}Error loading data from {img_path}\n{HELP_URL}") from e
+FileNotFoundError: [34m[1mval: [0mError loading data from /home/common/neural-safety-net/traffic-sign/traffic-sign-localization/newultralytics/dataset/images/test
+See https://docs.ultralytics.com/datasets for dataset formatting guidance.

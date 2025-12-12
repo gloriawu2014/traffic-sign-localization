@@ -1,85 +1,72 @@
-import os
 import json
+import os
 import shutil
-import random
 
-coco_json_path = "/home/chhlee28/traffic/traffic-sign-localization/data/DFG-tsd-annot-json/train.json"
-images_src_dir = "/home/chhlee28/traffic/traffic-sign-localization/data/JPEGImages"  # Path to folder with DFG images
-output_dir = "dataset"  # Output folder for YOLO dataset
+# -------------------- PATHS --------------------
+JSON_DIR = "/home/chhlee28/traffic/traffic-sign-localization/data/DFG-tsd-annot-json"
+OUTPUT_DIR = "/home/chhlee28/traffic/traffic-sign-localization/newultralytics/dataset"
 
+# Path where the images actually live
+IMG_SOURCE = "/home/chhlee28/traffic/traffic-sign-localization/data/DFG-tsd-annot-json/JPEGImages"
 
-with open(coco_json_path, "r") as f:
-    coco_data = json.load(f)
+# -------------------- DATA SPLITS --------------------
+SETS = {
+    "train": "train.json",
+    "test": "test.json"
+}
 
-images_info = {img["id"]: img for img in coco_data["images"]}
-annotations = coco_data["annotations"]
-categories = coco_data["categories"]
+# -------------------- CREATE FOLDERS --------------------
+for split in SETS.keys():
+    os.makedirs(f"{OUTPUT_DIR}/images/{split}", exist_ok=True)
+    os.makedirs(f"{OUTPUT_DIR}/labels/{split}", exist_ok=True)
 
-category_id_to_yolo_id = {cat["id"]: i for i, cat in enumerate(categories)}
-yolo_class_names = [cat["name"] for cat in categories]
+# -------------------- CLASS MAPPING --------------------
+with open(f"{JSON_DIR}/train.json") as f:
+    train_data = json.load(f)
 
-# -----------------------------
-# CREATE OUTPUT FOLDERS
-# -----------------------------
-os.makedirs(os.path.join(output_dir, "images", "train"), exist_ok=True)
-os.makedirs(os.path.join(output_dir, "labels", "train"), exist_ok=True)
+# Map category IDs → YOLO class numbers
+catid2cls = {cat["id"]: i for i, cat in enumerate(train_data["categories"])}
+print("Class mapping:", catid2cls)
 
-# -----------------------------
-# GROUP ANNOTATIONS BY IMAGE
-# -----------------------------
-annotations_by_image = {}
-for ann in annotations:
-    img_id = ann["image_id"]
-    annotations_by_image.setdefault(img_id, []).append(ann)
+# -------------------- CONVERSION --------------------
+for split, json_file in SETS.items():
+    print(f"\nProcessing {split}...")
 
-# -----------------------------
-# CONVERT EVERYTHING (NO SPLIT)
-# -----------------------------
-for img_id, img_info in images_info.items():
-    file_name = img_info["file_name"]
-    img_w, img_h = img_info["width"], img_info["height"]
+    with open(f"{JSON_DIR}/{json_file}") as f:
+        data = json.load(f)
 
-    anns = annotations_by_image.get(img_id, [])
-    yolo_lines = []
+    images = {img["id"]: img for img in data["images"]}
+    anns = data["annotations"]
 
     for ann in anns:
-        if ann.get("iscrowd", 0) == 1:
-            continue
+        img_id = ann["image_id"]
+        img_info = images[img_id]
+
+        file_name = img_info["file_name"]
+
+        # -------- Copy Image --------
+        src = f"{IMG_SOURCE}/{file_name}"
+        dst = f"{OUTPUT_DIR}/images/{split}/{file_name}"
+        if os.path.exists(src):
+            shutil.copy(src, dst)
+
+        # -------- Create YOLO Label --------
+        width = img_info["width"]
+        height = img_info["height"]
 
         x, y, w, h = ann["bbox"]
-        if w < 15 or h < 15:
-            continue
 
-        x_center = (x + w / 2) / img_w
-        y_center = (y + h / 2) / img_h
-        w_norm = w / img_w
-        h_norm = h / img_h
+        # Convert to YOLO format
+        xc = (x + w / 2) / width
+        yc = (y + h / 2) / height
+        nw = w / width
+        nh = h / height
 
-        class_id = category_id_to_yolo_id[ann["category_id"]]
-        yolo_lines.append(
-            f"{class_id} {x_center:.6f} {y_center:.6f} {w_norm:.6f} {h_norm:.6f}"
-        )
+        cls = catid2cls[ann["category_id"]]
 
-    # Copy image into train folder
-    shutil.copy(
-        os.path.join(images_src_dir, file_name),
-        os.path.join(output_dir, "images", "train", file_name)
-    )
+        label_path = f"{OUTPUT_DIR}/labels/{split}/{file_name.replace('.jpg', '.txt').replace('.png', '.txt')}"
+        with open(label_path, "a") as f:
+            f.write(f"{cls} {xc} {yc} {nw} {nh}\n")
 
-    # Create matching label file
-    label_file = os.path.join(
-        output_dir,
-        "labels",
-        "train",
-        os.path.splitext(file_name)[0] + ".txt"
-    )
-    with open(label_file, "w") as f:
-        f.write("\n".join(yolo_lines))
-
-# -----------------------------
-# SAVE CLASS NAMES FILE
-# -----------------------------
-with open(os.path.join(output_dir, "classes.txt"), "w") as f:
-    f.write("\n".join(yolo_class_names))
-
-print("Conversion complete! YOLO dataset ready at:", output_dir)
+print("\nConversion complete!")
+print(f"Dataset saved in: {OUTPUT_DIR}")

@@ -6,8 +6,9 @@ model = YOLO(
 )
 
 # Validate on separate data
-model.val(
+results = model.val(
     data="/home/chhlee28/traffic/traffic-sign-localization/newultralytics/dfg.yaml",
     project="/home/chhlee28/traffic/traffic-sign-localization/newultralytics/results2",
-    name="yolo2",
-)
+    name="yolo_test", split="test")
+
+print(results.metrics)
